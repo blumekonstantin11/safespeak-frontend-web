@@ -11,6 +11,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
+            padding-top: calc(20px + env(safe-area-inset-top));
         }
 
         .container {
@@ -19,7 +20,7 @@
             max-width: 600px; /* Schränkt die Größe auf großen Bildschirmen ein */
             margin: 0 auto;
             background: #fff;
-            padding: 20px 10px; /* Reduzierter horizontaler Rand für Handys */
+            padding: 10px 10px; /* Reduzierter horizontaler Rand für Handys */
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -279,7 +280,7 @@
                 <button type="submit">Anmelden</button>
             </form>
          <pre id="response" class="status"></pre> 
-         
+
 
         <div id="message-section">
             <h2>Nachricht senden</h2>
