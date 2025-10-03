@@ -149,8 +149,6 @@
             align-items: center;
             margin-top: 20px;
             justify-content: flex-end;
-            right: 30px;
-            z-index: 1000;
         }
 
         .theme-switch {
@@ -279,8 +277,7 @@
                 </div>
                 <button type="submit">Anmelden</button>
             </form>
-         <pre id="response" class="status"></pre> 
-
+        
 
         <div id="message-section">
             <h2>Nachricht senden</h2>
@@ -298,19 +295,19 @@
             <input type="text" id="chatPartner" placeholder="Username des Chat-Partners" required>
             <button id="refreshButton">Nachrichten laden</button>
             <pre id="messages"></pre>
+            <div></div>
+         
+        <pre id="response" class="status"></pre>
 
-                    <div class="theme-switch-wrapper">
-                        <label class="theme-switch" for="checkbox">
-                            <input type="checkbox" id="checkbox" />
-                            <div class="slider round"></div>
-                        </label>
-                        <em>Dunkler Modus</em>
-                    </div>
-            
-                </div>
+        <div class="theme-switch-wrapper">
+            <label class="theme-switch" for="checkbox">
+                <input type="checkbox" id="checkbox" />
+                <div class="slider round"></div>
+            </label>
+            <em>Dunkler Modus</em>
+        </div>
 
-        </div>        
-
+    </div>
     <script>
         const API_URL = 'https://safespeak-api-server.onrender.com';
         const responseDiv = document.getElementById('response');
