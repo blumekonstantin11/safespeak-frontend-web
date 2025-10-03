@@ -410,30 +410,33 @@
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
     
-            // ... (Code zum Abrufen von Username und Passwort) ...
+            // 1. Daten abrufen
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
 
+            // 2. FETCH-Anfrage mit POST-Methode senden
             const res = await fetch(`${API_URL}/register`, {
-                // ... (fetch-Konfiguration) ...
+                method: 'POST', // <<--- KORRIGIERTE METHODE EINGEFÜGT!
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username, password })
             });
+            
             const data = await res.json();
     
             if (res.ok) {
-                // Wenn die Registrierung erfolgreich war:
+                // Wenn die Registrierung erfolgreich war, sofort anmelden
                 await loginAndDisplay(username, password);
-        
-                // NEU: Erfolgsmeldung im Terminal (optional: Du kannst die Meldung auch direkt aus dem Login übernehmen, wenn loginAndDisplay das Terminal leert/überschreibt)
                 responseDiv.textContent = `ERFOLG: ${data.message || 'Registrierung und Login erfolgreich!'}`; 
-            } 
-    
-            // NEU: Fehlerbehandlung hinzufügen
-            if (data.error) {
-                responseDiv.textContent = `FEHLER: ${data.error}`; 
-            } else if (!res.ok) {
-                // Fallback für einen generischen Fehlerstatus (z.B. 404, 500)
-                responseDiv.textContent = `FEHLER: Registrierung fehlgeschlagen (Status: ${res.status})`;
+            } else {
+                // Fehlerbehandlung
+                if (data.error) {
+                    responseDiv.textContent = `FEHLER: ${data.error}`; 
+                } else {
+                    responseDiv.textContent = `FEHLER: Registrierung fehlgeschlagen (Status: ${res.status})`;
+                }
             }
-    
-            // // responseDiv.textContent = JSON.stringify(data, null, 2); // <- DIE ALTE ZEILE LÖSCHEN!
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
