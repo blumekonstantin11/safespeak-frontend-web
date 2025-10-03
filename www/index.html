@@ -143,8 +143,8 @@
         .theme-switch-wrapper {
             display: flex;
             align-items: center;
-            position: fixed;
-            top: 20px;
+            margin-top: 20px;
+            justify-content: flex-end;
             right: 30px;
             z-index: 1000;
         }
@@ -251,14 +251,7 @@
         <div class="header">
             <h2 id="loggedInUsername"></h2>
             <img src="SafeSpeak.png" alt="SafeSpeak Logo" style="width: 200px; display: block; margin-left: auto; margin-right: 20px;">
-            <div class="theme-switch-wrapper">
-                <label class="theme-switch" for="checkbox">
-                    <input type="checkbox" id="checkbox" />
-                    <div class="slider round"></div>
-                </label>
-                <em>Dunkler Modus</em>
-            </div>
-        </div>
+        <div></div>    
         
         <div id="auth-section">
             <h2>Benutzer registrieren</h2>
@@ -300,10 +293,19 @@
             <input type="text" id="chatPartner" placeholder="Username des Chat-Partners" required>
             <button id="refreshButton">Nachrichten laden</button>
             <pre id="messages"></pre>
-        </div>
-        
-        <pre id="response" class="status"></pre>
-    </div>
+
+                    <div class="theme-switch-wrapper">
+                        <label class="theme-switch" for="checkbox">
+                            <input type="checkbox" id="checkbox" />
+                            <div class="slider round"></div>
+                        </label>
+                        <em>Dunkler Modus</em>
+                    </div>
+            
+                </div>
+
+                <pre id="response" class="status"></pre> 
+            </div>
 
     <script>
         const API_URL = 'https://safespeak-api-server.onrender.com';
