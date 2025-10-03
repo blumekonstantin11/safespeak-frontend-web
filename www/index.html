@@ -88,13 +88,17 @@
         }
 
         .status {
-            margin-top: 20px;
+            margin-top: 20px; /* Sicherstellen, dass Abstand zum Anmeldebutton besteht */
+            margin-bottom: 20px; /* Fügen Sie unten Abstand hinzu */
             font-style: italic;
             color: #555;
-            background: #fff3cd;
+            background: #fff3cd; 
             padding: 10px;
             border: 1px solid #ffeeba;
             border-radius: 4px;
+            /* Fügen Sie width: 100% hinzu, um sicherzustellen, dass es die volle Breite einnimmt */
+            width: 100%; 
+            box-sizing: border-box; /* Stellt sicher, dass Padding in der Breite enthalten ist */
         }
 
         hr {
@@ -288,6 +292,9 @@
                 <input type="file" id="file" name="file"><br>
                 <button type="submit">Nachricht senden</button>
             </form>
+
+            <pre id="response" class="status"></pre>
+        </div>
 
             <hr>
 
