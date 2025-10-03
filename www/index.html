@@ -14,10 +14,12 @@
         }
 
         .container {
-            max-width: 800px;
+            /* Entfernen Sie die feste max-width, um sich an Mobilgeräte anzupassen */
+            width: 95%; /* Setzt die Breite auf 95% des Bildschirms */
+            max-width: 600px; /* Schränkt die Größe auf großen Bildschirmen ein */
             margin: 0 auto;
             background: #fff;
-            padding: 20px 30px;
+            padding: 20px 10px; /* Reduzierter horizontaler Rand für Handys */
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
@@ -250,7 +252,7 @@
     <div class="container">
         <div class="header">
             <h2 id="loggedInUsername"></h2>
-            <img src="SafeSpeak.png" alt="SafeSpeak Logo" style="width: 200px; display: block; margin-left: auto; margin-right: 20px;">
+            <img src="SafeSpeak.png" alt="SafeSpeak Logo" style="max-width: 100%; height: auto; display: block; margin-left: auto; margin-right: 20px;">
         <div></div>    
         
         <div id="auth-section">
