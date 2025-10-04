@@ -256,7 +256,6 @@
     <div class="container">
         <div class="header">
             <h2 id="loggedInUsername"></h2>
-            <img src="SafeSpeak.png" alt="SafeSpeak Logo" style="max-width: 70px; height: auto; display: block; margin-left: auto; margin-right: 20px;">
         <div></div>    
         
         <div id="auth-section">
@@ -305,16 +304,13 @@
          
         <pre id="response" class="status"></pre>
 
-        <div class="theme-switch-wrapper">
-            <label class="theme-switch" for="checkbox">
-                <input type="checkbox" id="checkbox" />
-                <div class="slider round"></div>
-            </label>
-            <em>Dunkler Modus</em>
-        </div>
+                <img src="SafeSpeak.png" 
+                    alt="SafeSpeak Logo" 
+                    id="theme-toggle-img"
+                    style="max-width: 70px; height: auto; display: block; margin-left: auto; margin-right: 20px; cursor: pointer; float: right; margin-bottom: 20px;">
 
-    </div>
-    <script>
+        </div>
+        <script>
         const API_URL = 'https://safespeak-api-server.onrender.com';
         const responseDiv = document.getElementById('response');
         const authSection = document.getElementById('auth-section');
@@ -331,17 +327,19 @@
             }
         }
         
-        const toggleSwitch = document.querySelector('#checkbox');
+        const toggleImage = document.getElementById('theme-toggle-img');
+        let isDarkMode = false; // Wir benötigen eine Variable, um den Zustand zu verfolgen
 
-        function switchTheme(e) {
-            if (e.target.checked) {
+        function switchTheme() {
+            isDarkMode = !isDarkMode; // Zustand umschalten
+            if (isDarkMode) {
                 document.body.classList.add('dark-mode');
             } else {
                 document.body.classList.remove('dark-mode');
             }
         }
 
-        toggleSwitch.addEventListener('change', switchTheme, false);
+        toggleImage.addEventListener('click', switchTheme, false);
 
 
         async function fetchAndDisplayMessages() {
