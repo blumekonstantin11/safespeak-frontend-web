@@ -44,7 +44,7 @@
         input[type="password"],
         input[type="number"],
         textarea {
-            width: 95%;
+            width: 95%; /* MUSS 95% BLEIBEN */
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -110,22 +110,23 @@
             margin: 20px 0;
         }
         
-        /* Zusätzliche CSS-Regeln */
         .password-container {
             position: relative;
-            width: 95%;
+            /* width: 95%; BEIBEHALTEN, damit es die gleiche Basisbreite wie die anderen Inputs hat */
+            width: 95%; 
             margin-bottom: 10px;
-            box-sizing: border-box;
+            box-sizing: border-box; 
         }
 
         .password-container input {
-            width: 100%;
-            padding-right: 40px;
+            width: 90%;
+            padding-right: 10px;
+            box-sizing: border-box;
         }
 
         .password-container .toggle-password {
             position: absolute;
-            right: 10px;
+            right: -30px;
             top: 50%;
             transform: translateY(-50%);
             background: transparent;
