@@ -134,10 +134,10 @@
         
         .header {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: space-between; /* Abstand zwischen Logo und Username */
+            align-items: flex-start; /* Startet oben */
             margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-wrap: wrap; 
         }
 
         #loggedInUsername {
@@ -145,14 +145,6 @@
             font-weight: bold;
             color: #3498db;
             margin-right: auto;
-        }
-
-        /* Styling für den Schalter */
-        .theme-switch-wrapper {
-            display: flex;
-            align-items: center;
-            margin-top: 20px;
-            justify-content: flex-end;
         }
 
         .theme-switch {
@@ -256,7 +248,13 @@
     <div class="container">
         <div class="header">
             <h2 id="loggedInUsername"></h2>
-        <div></div>    
+
+            <img src="SafeSpeak.png" 
+                 alt="SafeSpeak Logo" 
+                 id="theme-toggle-img"
+                 style="max-width: 70px; height: auto; display: block; cursor: pointer;">
+
+        </div>    
         
         <div id="auth-section">
             <h2>Benutzer registrieren</h2>
@@ -303,11 +301,6 @@
             <div></div>
          
         <pre id="response" class="status"></pre>
-
-                <img src="SafeSpeak.png" 
-                    alt="SafeSpeak Logo" 
-                    id="theme-toggle-img"
-                    style="max-width: 70px; height: auto; display: block; margin-left: auto; margin-right: 20px; cursor: pointer; float: right; margin-bottom: 20px;">
 
         </div>
         <script>
