@@ -362,7 +362,14 @@
                             
                             if (msg.file_path) {
                                 const fileName = msg.file_path.split('/').pop();
-                                messageHtml += ` <br>Datei: <a href="${API_URL}/${msg.file_path}" download="${fileName}"><button>Download</button></a>`;
+                                // NEUER CODE (GESCHÜTZT)
+                                // Wir extrahieren nur den Dateinamen (z.B. 123456789.jpg) aus dem Pfad (uploads/123456789.jpg)
+                                const justFileName = msg.file_path.split('/').pop();
+
+                                // Wir bauen den Link zur neuen geschützten Route `/download/` und schicken den Benutzernamen mit
+                                const downloadUrl = `${API_URL}/download/${justFileName}?username=${loggedInUser.username}`;
+
+                                messageHtml += ` <br>Datei: <a href="${downloadUrl}" download="${fileName}"><button>Download</button></a>`;
                             }
                             
                             const p = document.createElement('p');
