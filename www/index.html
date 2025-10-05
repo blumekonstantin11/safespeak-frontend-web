@@ -309,12 +309,28 @@
 
         </div>
         <script>
-        const API_URL = 'https://safespeak-api-server.onrender.com';
+        // ACHTUNG: Die API_URL muss die URL DEINES Render-Servers sein!
+        const API_URL = 'https://dein-safespeak-server.onrender.com'; 
         const responseDiv = document.getElementById('response');
         const authSection = document.getElementById('auth-section');
         const messageSection = document.getElementById('message-section');
         const messagesDiv = document.getElementById('messages');
-        let loggedInUser = null;
+        let loggedInUser = null; // Wir speichern den Nutzernamen lokal
+        
+        // Initialisierungscheck beim Laden der Seite
+        function checkLoginStatus() {
+            const username = localStorage.getItem('safespeakUsername');
+            const token = localStorage.getItem('safespeakToken');
+            if (username && token) {
+                // Wir nehmen an, dass der Token gültig ist (könnten hier einen /verify-Endpunkt aufrufen)
+                loggedInUser = { username: username, id: null }; // ID ist optional
+                authSection.style.display = 'none';
+                messageSection.style.display = 'block';
+                document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}!`;
+            }
+        }
+        window.onload = checkLoginStatus; // Beim Laden prüfen
+
 
         function togglePasswordVisibility(fieldId) {
             const field = document.getElementById(fieldId);
@@ -325,23 +341,25 @@
             }
         }
         
+        // ... (Theme-Switch-Code bleibt unverändert)
         const toggleImage = document.getElementById('theme-toggle-img');
-        let isDarkMode = false; // Wir benötigen eine Variable, um den Zustand zu verfolgen
-
+        let isDarkMode = false;
         function switchTheme() {
-            isDarkMode = !isDarkMode; // Zustand umschalten
-            if (isDarkMode) {
-                document.body.classList.add('dark-mode');
-            } else {
-                document.body.classList.remove('dark-mode');
-            }
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode', isDarkMode);
         }
-
         toggleImage.addEventListener('click', switchTheme, false);
+        // ...
 
 
         async function fetchAndDisplayMessages() {
-            if (!loggedInUser) return;
+            // HOLT DEN TOKEN FÜR DIE AUTHENTIFIZIERUNG
+            const token = localStorage.getItem('safespeakToken');
+            if (!token) {
+                messagesDiv.textContent = 'Fehler: Nicht angemeldet.';
+                return;
+            }
+
             const friendUsername = document.getElementById('chatPartner').value;
             if (!friendUsername) {
                 messagesDiv.textContent = 'Bitte gib einen Chat-Partner-Username ein.';
@@ -349,27 +367,31 @@
             }
             
             try {
-                const res = await fetch(`${API_URL}/messages?user1=${loggedInUser.username}&user2=${friendUsername}`);
+                // Wichtig: Wir schicken nur user2 mit, da user1 aus dem Token geholt wird (sicherer!)
+                const res = await fetch(`${API_URL}/messages?user2=${friendUsername}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}` // TOKEN MITSCHICKEN!
+                    }
+                });
                 const data = await res.json();
                 
                 if (res.ok) {
                     messagesDiv.innerHTML = '';
                     if (data && data.length > 0) {
                         data.forEach(msg => {
-                            const senderName = msg.sender_id === loggedInUser.id ? loggedInUser.username : friendUsername;
+                            // Annahme: loggedInUser.username ist gesetzt
+                            const currentUsername = localStorage.getItem('safespeakUsername'); 
+                            const senderName = msg.sender_id === data[0].sender_id ? (msg.sender_id === loggedInUser.id ? currentUsername : friendUsername) : (msg.sender_id === loggedInUser.id ? currentUsername : friendUsername);
+
+                            // Korrigierte Logik zur Ermittlung des Senders (basiert auf ID, falls vorhanden)
+                            const senderDisplay = msg.sender_id === loggedInUser.id ? 'Du' : friendUsername;
                             
-                            let messageHtml = `[${msg.timestamp}] ${senderName}: ${msg.content || 'Kein Text'}`;
+                            let messageHtml = `[${msg.timestamp.substring(11, 16)}] <b>${senderDisplay}:</b> ${msg.content || 'Kein Text'}`;
                             
                             if (msg.file_path) {
-                                const fileName = msg.file_path.split('/').pop();
-                                // NEUER CODE (GESCHÜTZT)
-                                // Wir extrahieren nur den Dateinamen (z.B. 123456789.jpg) aus dem Pfad (uploads/123456789.jpg)
                                 const justFileName = msg.file_path.split('/').pop();
-
-                                // Wir bauen den Link zur neuen geschützten Route `/download/` und schicken den Benutzernamen mit
-                                const downloadUrl = `${API_URL}/download/${justFileName}?username=${loggedInUser.username}`;
-
-                                messageHtml += ` <br>Datei: <a href="${downloadUrl}" download="${fileName}"><button>Download</button></a>`;
+                                const downloadUrl = `${API_URL}/download/${justFileName}`; // Username wird NICHT MEHR IM QUERY benötigt, da wir den Token nutzen
+                                messageHtml += ` <br>Datei: <a href="${downloadUrl}" download="${justFileName}"><button style="margin-top: 5px;">Download (Geschützt)</button></a>`;
                             }
                             
                             const p = document.createElement('p');
@@ -379,8 +401,11 @@
                     } else {
                         messagesDiv.innerHTML = `<p>Keine Nachrichten mit ${friendUsername} gefunden.</p>`;
                     }
+                } else if (res.status === 403 || res.status === 401) {
+                    responseDiv.textContent = 'SITZUNG ABGELAUFEN. Bitte erneut anmelden.';
+                    logout(); // Bei ungültigem Token ausloggen
                 } else {
-                    responseDiv.textContent = `Fehler beim Abrufen der Nachrichten: ${JSON.stringify(data, null, 2)}`;
+                    responseDiv.textContent = `Fehler beim Abrufen der Nachrichten: ${data.message || 'Unbekannter Fehler'}`;
                 }
             } catch (error) {
                 console.error('Fetch-Fehler:', error);
@@ -395,59 +420,42 @@
                 body: JSON.stringify({ username, password })
             });
             const data = await res.json();
+            
             if (res.ok) {
+                // NEU: TOKEN UND USERNAME SPEICHERN
+                localStorage.setItem('safespeakToken', data.token);
+                localStorage.setItem('safespeakUsername', username);
+                
                 loggedInUser = { username: username, id: data.userId };
                 authSection.style.display = 'none';
                 messageSection.style.display = 'block';
                 document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}!`;
-            }
-                // ... Ende des if (res.ok) Blocks ...
-    
-                // HIER KORRIGIEREN:
-                if (data.error) {
-                // Der Server hat eine Fehlermeldung (z.B. "Ungültiges Passwort") gesendet
-                responseDiv.textContent = `FEHLER: ${data.error}`;
-            } else if (!res.ok) {
-                // Der Server hat einen anderen unbekannten HTTP-Fehlercode gesendet
-                responseDiv.textContent = `FEHLER: Anmeldung fehlgeschlagen (Status: ${res.status})`;
-            } else {
-                // Fallback für den Login-Code, falls er oben erfolgreich war
                 responseDiv.textContent = `Anmeldung erfolgreich: ${data.message || 'Willkommen!'}`;
-            }
 
-            // Die alte Zeile MUSS gelöscht oder auskommentiert werden:
-            // responseDiv.textContent = JSON.stringify(data, null, 2);
+            } else {
+                // Fehlerbehandlung
+                responseDiv.textContent = `FEHLER: ${data.error || `Anmeldung fehlgeschlagen (Status: ${res.status})`}`;
+            }
         }
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-    
-            // 1. Daten abrufen
             const username = document.getElementById('regUsername').value;
             const password = document.getElementById('regPassword').value;
 
-            // 2. FETCH-Anfrage mit POST-Methode senden
             const res = await fetch(`${API_URL}/register`, {
-                method: 'POST', // <<--- KORRIGIERTE METHODE EINGEFÜGT!
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
             
             const data = await res.json();
     
             if (res.ok) {
-                // Wenn die Registrierung erfolgreich war, sofort anmelden
                 await loginAndDisplay(username, password);
                 responseDiv.textContent = `ERFOLG: ${data.message || 'Registrierung und Login erfolgreich!'}`; 
             } else {
-                // Fehlerbehandlung
-                if (data.error) {
-                    responseDiv.textContent = `FEHLER: ${data.error}`; 
-                } else {
-                    responseDiv.textContent = `FEHLER: Registrierung fehlgeschlagen (Status: ${res.status})`;
-                }
+                responseDiv.textContent = `FEHLER: ${data.errors || data.error || `Registrierung fehlgeschlagen (Status: ${res.status})`}`;
             }
         });
 
@@ -465,8 +473,16 @@
             const fileInput = document.getElementById('file');
             const file = fileInput.files[0];
 
+            // 1. TOKEN PRÜFEN
+            const token = localStorage.getItem('safespeakToken');
+            if (!token) {
+                responseDiv.textContent = "FEHLER: Nicht angemeldet (Token fehlt).";
+                logout();
+                return;
+            }
+
             const formData = new FormData();
-            formData.append('senderUsername', loggedInUser.username);
+            // SenderUsername wird vom Server aus dem Token geholt. Nur Empfänger ist nötig!
             formData.append('receiverUsername', receiverUsername);
 
             if (content) {
@@ -478,6 +494,10 @@
             
             const res = await fetch(`${API_URL}/send`, {
                 method: 'POST',
+                // HIER: Authorization-Header hinzufügen!
+                headers: {
+                    'Authorization': `Bearer ${token}` 
+                },
                 body: formData
             });
             
@@ -486,21 +506,33 @@
                 fetchAndDisplayMessages();
                 document.getElementById('messageContent').value = '';
                 document.getElementById('file').value = '';
+                responseDiv.textContent = `ERFOLG: ${data.message || 'Nachricht gesendet.'}`;
+            } else {
+                if (res.status === 403) {
+                     responseDiv.textContent = 'FEHLER: Sitzung abgelaufen. Bitte neu anmelden.';
+                     logout();
+                } else {
+                    responseDiv.textContent = `FEHLER: ${data.errors || data.error || 'Senden fehlgeschlagen.'}`;
+                }
             }
-            responseDiv.textContent = JSON.stringify(data, null, 2);
         });
 
         document.getElementById('refreshButton').addEventListener('click', fetchAndDisplayMessages);
 
         function logout() {
-            loggedInUser = null; // Benutzerdaten zurücksetzen
-            document.getElementById('loggedInUsername').textContent = 'Willkommen!'; // Standardtext wiederherstellen
-            authSection.style.display = 'block'; // Anmeldebereich anzeigen
-            messageSection.style.display = 'none'; // Nachrichtenbereich ausblenden
+            // LÖSCHT DIE GESPEICHERTEN GEHEIMNISSE
+            localStorage.removeItem('safespeakToken');
+            localStorage.removeItem('safespeakUsername');
+            
+            loggedInUser = null; 
+            document.getElementById('loggedInUsername').textContent = 'Willkommen!'; 
+            authSection.style.display = 'block'; 
+            messageSection.style.display = 'none'; 
+            messagesDiv.innerHTML = ''; // Nachrichtenverlauf leeren
         }
 
         // Event-Listener zum Textfeld hinzufügen
         document.getElementById('loggedInUsername').addEventListener('click', logout);
-    </script>
+</script>
 </body>
 </html>
