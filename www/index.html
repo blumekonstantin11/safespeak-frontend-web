@@ -150,6 +150,7 @@
             font-weight: bold;
             color: #3498db;
             margin-right: auto;
+            cursor: pointer; /* Klickbar für Logout */
         }
 
         .theme-switch {
@@ -374,15 +375,39 @@
 
         // --- Der Rest deines Codes folgt hier ---
 
+        const loggedInUsernameEl = document.getElementById('loggedInUsername');
+
+        function applyLoggedInUI(username) {
+            loggedInUser = { username: username, id: null };
+            authSection.style.display = 'none';
+            messageSection.style.display = 'block';
+            if (loggedInUsernameEl) {
+                loggedInUsernameEl.textContent = `Willkommen, ${username}! (zum Abmelden klicken)`;
+            }
+        }
+
         function checkLoginStatus() {
             const username = localStorage.getItem('safespeakUsername');
             const token = localStorage.getItem('safespeakToken');
             if (username && token) {
-                loggedInUser = { username: username, id: null };
-                authSection.style.display = 'none';
-                messageSection.style.display = 'block';
-                document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}!`;
+                applyLoggedInUI(username);
             }
+        }
+
+        function logout() {
+            localStorage.removeItem('safespeakUsername');
+            localStorage.removeItem('safespeakToken');
+            loggedInUser = null;
+            authSection.style.display = 'block';
+            messageSection.style.display = 'none';
+            if (loggedInUsernameEl) {
+                loggedInUsernameEl.textContent = '';
+            }
+            responseDiv.textContent = 'Du wurdest abgemeldet.';
+        }
+
+        if (loggedInUsernameEl) {
+            loggedInUsernameEl.addEventListener('click', logout);
         }
         
 
@@ -537,10 +562,7 @@
                     localStorage.setItem('safespeakToken', data.token);
                 }
 
-                loggedInUser = { username: username, id: data.userId || null };
-                authSection.style.display = 'none';
-                messageSection.style.display = 'block';
-                document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}!`;
+                applyLoggedInUI(username);
 
                 responseDiv.textContent = data.message || 'Anmeldung erfolgreich!';
             } catch (err) {
