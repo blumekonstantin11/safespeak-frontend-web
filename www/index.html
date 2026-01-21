@@ -267,7 +267,7 @@
                 <input type="text" id="regUsername" placeholder="Benutzername" required><br>
                 <div class="password-container">
                     <input type="password" id="regPassword" placeholder="Passwort" required>
-                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('regPassword')">👁️</button>
+                    <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
                 </div>
                 <button type="submit">Registrieren</button>
             </form>
@@ -279,7 +279,7 @@
                 <input type="text" id="loginUsername" placeholder="Benutzername" required><br>
                 <div class="password-container">
                     <input type="password" id="loginPassword" placeholder="Passwort" required>
-                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPassword')">👁️</button>
+                    <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
                 </div>
                 <button type="submit">Anmelden</button>
             </form>
@@ -386,6 +386,13 @@
             if (!input) return;
             input.type = input.type === 'password' ? 'text' : 'password';
         }
+
+        // Event-Listener für alle Auge-Buttons setzen (statt inline-onclick)
+        document.querySelectorAll('.toggle-password').forEach((btn) => {
+            const targetId = btn.dataset.target;
+            if (!targetId) return;
+            btn.addEventListener('click', () => togglePasswordVisibility(targetId));
+        });
 
         // --- Theme-Kippschalter (Hell/Dunkel) ---
         const toggleImage = document.getElementById('theme-toggle-img');
