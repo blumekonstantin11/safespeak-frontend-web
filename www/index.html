@@ -356,6 +356,9 @@
 
         // WICHTIG: Die Initialisierung und der Login-Check müssen warten, bis die URL gefunden ist!
         async function initializeApp() {
+            // Theme aus localStorage wiederherstellen
+            loadInitialTheme();
+
             const urlFound = await findApiUrl();
             if (urlFound) {
                 checkLoginStatus(); // Nur fortfahren, wenn Server gefunden
@@ -375,14 +378,53 @@
                 document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}!`;
             }
         }
+        
 
+        // Passwortsichtbarkeit mit dem Auge-Icon umschalten
+        function togglePasswordVisibility(fieldId) {
+            const input = document.getElementById(fieldId);
+            if (!input) return;
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
 
-        // ... (togglePasswordVisibility und switchTheme bleiben unverändert)
-        function togglePasswordVisibility(fieldId) { /* ... */ }
+        // --- Theme-Kippschalter (Hell/Dunkel) ---
         const toggleImage = document.getElementById('theme-toggle-img');
+        const themeToggleCheckbox = document.getElementById('themeToggle');
         let isDarkMode = false;
-        function switchTheme() { /* ... */ }
-        toggleImage.addEventListener('click', switchTheme, false);
+
+        function applyTheme(dark) {
+            isDarkMode = dark;
+            document.body.classList.toggle('dark-mode', dark);
+            if (themeToggleCheckbox) {
+                themeToggleCheckbox.checked = dark;
+            }
+            try {
+                localStorage.setItem('safespeakTheme', dark ? 'dark' : 'light');
+            } catch (e) {
+                console.warn('Konnte Theme nicht im localStorage speichern:', e);
+            }
+        }
+
+        function loadInitialTheme() {
+            let saved = null;
+            try {
+                saved = localStorage.getItem('safespeakTheme');
+            } catch (e) {
+                console.warn('Konnte Theme nicht aus localStorage lesen:', e);
+            }
+            applyTheme(saved === 'dark');
+        }
+
+        function switchTheme() {
+            applyTheme(!isDarkMode);
+        }
+
+        if (toggleImage) {
+            toggleImage.addEventListener('click', switchTheme, false);
+        }
+        if (themeToggleCheckbox) {
+            themeToggleCheckbox.addEventListener('change', switchTheme, false);
+        }
 
 
         // WICHTIG: Alle fetch-Funktionen müssen jetzt prüfen, ob API_URL gesetzt ist.
