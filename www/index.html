@@ -309,14 +309,20 @@
 
         </div>
         <script>
-        // Liste aller möglichen Server-URLs, die Render zuweisen könnte.
-        // FÜGE HIER IMMER DIE NEUESTE, FUNKTIONIERENDE URL AN ERSTER STELLE EIN!
-        const POSSIBLE_API_URLS = [
-            'http://localhost:3000',                          // Lokaler Entwicklungsserver
-            'https://safespeak-api-server-xyz.onrender.com', // Deine heute funktionierende URL
-            'https://safespeak-api-server.onrender.com',      // Deine alte URL
-            // Füge bei Bedarf weitere URLs hinzu, falls Render sie ändert
-        ];
+        // Liste aller möglichen Server-URLs.
+        // Lokal nutzen wir localhost, in Produktion nur die öffentliche Render-URL.
+        const isLocalhost =
+            window.location.hostname === 'localhost' ||
+            window.location.hostname === '127.0.0.1';
+
+        const POSSIBLE_API_URLS = isLocalhost
+            ? [
+                'http://localhost:3000', // Lokaler Entwicklungsserver
+            ]
+            : [
+                'https://safespeak-api-server.onrender.com', // Öffentliche Render-URL für Produktion
+                // 'https://safespeak-api-server-xyz.onrender.com', // Optionaler Fallback, derzeit deaktiviert (CORS)
+            ];
         
         // Diese Variable wird die funktionierende URL speichern, sobald sie gefunden wurde
         let API_URL = null; 
