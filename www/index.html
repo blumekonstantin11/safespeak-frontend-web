@@ -266,6 +266,7 @@
             <h2>Benutzer registrieren</h2>
             <form id="registerForm">
                 <input type="text" id="regUsername" placeholder="Benutzername" required><br>
+                <input type="text" id="regLocation" placeholder="Dein Ort (z.B. Berlin)">
                 <div class="password-container">
                     <input type="password" id="regPassword" placeholder="Passwort" required>
                     <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
@@ -286,6 +287,12 @@
             </form>
 
             <pre id="response" class="status"></pre>
+        </div>
+
+        <div id="contacts-section">
+            <h2>Vorschläge & Kontakte</h2>
+            <div id="contact-list" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
+                </div>
         </div>
 
         <div id="message-section">
@@ -326,7 +333,8 @@
             ];
         
         // Diese Variable wird die funktionierende URL speichern, sobald sie gefunden wurde
-        let API_URL = null; 
+        let API_URL = null; let messagePollingInterval = null; // Speichert den Timer
+                            let lastMessageCount = 0; // Hilft uns, nur bei neuen Nachrichten zu scrollen 
         
         const responseDiv = document.getElementById('response');
         const authSection = document.getElementById('auth-section');
@@ -377,13 +385,107 @@
 
         const loggedInUsernameEl = document.getElementById('loggedInUsername');
 
+        async function loadContacts() {
+            if (!API_URL) return;
+    
+        try {
+            const res = await fetch(`${API_URL}/contacts`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+        
+            if (res.ok) {
+                const contacts = await res.json();
+                const list = document.getElementById('contact-list');
+                list.innerHTML = ''; // Leeren
+            
+                if (contacts.length === 0) {
+                    list.innerHTML = '<small>Keine Kontakte in der Nähe gefunden.</small>';
+                    return;
+                }
+
+                contacts.forEach(user => {
+                    const btn = document.createElement('button');
+                    btn.style.fontSize = '12px';
+                    btn.style.padding = '5px 10px';
+                    btn.style.backgroundColor = '#27ae60';
+                    btn.textContent = `${user.username} (${user.location || '?'})`;
+                
+                    // Klick setzt den Empfänger automatisch
+                    btn.onclick = () => {
+                        document.getElementById('receiverUsername').value = user.username;
+                        document.getElementById('chatPartner').value = user.username;
+                        fetchAndDisplayMessages();
+                    };
+                    list.appendChild(btn);
+                });
+            }
+        } catch (err) {
+            console.error("Fehler beim Laden der Kontakte:", err);
+        }
+    }
+        async function fetchAndDisplayMessages(isBackground = false) {
+            const chatPartner = document.getElementById('chatPartner').value.trim();
+            if (!chatPartner) return;
+
+            try {
+                const res = await fetch(`${API_URL}/messages?user2=${chatPartner}`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                if (!res.ok) throw new Error("Fehler beim Laden");
+
+                const messages = await res.json();
+        
+                // Nur UI updaten, wenn sich die Anzahl der Nachrichten geändert hat
+                if (messages.length !== lastMessageCount) {
+                    messagesDiv.innerHTML = ''; 
+            
+                    messages.forEach(msg => {
+                        const p = document.createElement('p');
+                        // Wir nutzen hier die IDs aus der Datenbank
+                        const isMe = (msg.sender_id === loggedInUser.id);
+                        const senderName = isMe ? "Du" : chatPartner;
+                
+                        let content = `<strong>${senderName}:</strong> ${msg.content}`;
+                        if (msg.file_path) {
+                        const fileName = msg.file_path.split('/').pop();
+                        content += `<br><small>📎 <a href="#" onclick="downloadFile('${msg.file_path}')">${fileName}</a></small>`;
+                        }
+                
+                        p.innerHTML = content;
+                        // Optional: Eigene Nachrichten leicht anders färben
+                        if(isMe) p.style.color = "#3498db"; 
+                
+                        messagesDiv.appendChild(p);
+                    });
+
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                    lastMessageCount = messages.length;
+                }
+            } catch (err) {
+                if (!isBackground) console.error(err);
+            }
+        }
+
         function applyLoggedInUI(username) {
             loggedInUser = { username: username, id: null };
             authSection.style.display = 'none';
             messageSection.style.display = 'block';
             if (loggedInUsernameEl) {
-                loggedInUsernameEl.textContent = `Willkommen, ${username}! (zum Abmelden klicken)`;
+                loggedInUsernameEl.textContent = `Willkommen, ${username}! (Abmelden)`;
             }
+            loadContacts();
+
+            // Startet das Polling alle 3 Sekunden
+            if (messagePollingInterval) clearInterval(messagePollingInterval);
+            messagePollingInterval = setInterval(() => {
+                const chatPartner = document.getElementById('chatPartner').value.trim();
+                if (chatPartner) {
+                    fetchAndDisplayMessages(true); // "true" bedeutet: im Hintergrund laden
+                }
+            }, 3000);
         }
 
         function checkLoginStatus() {
@@ -408,8 +510,9 @@
 
         if (loggedInUsernameEl) {
             loggedInUsernameEl.addEventListener('click', logout);
-        }
         
+            clearInterval(messagePollingInterval); // Stoppt die Abfrage beim Logout
+        }
 
         // Passwortsichtbarkeit mit dem Auge-Icon umschalten
         function togglePasswordVisibility(fieldId) {
@@ -494,20 +597,18 @@
                 return;
             }
 
-            const username = document.getElementById('regUsername').value.trim();
-            const password = document.getElementById('regPassword').value;
+        // ... im registerForm Event Listener ...
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const location = document.getElementById('regLocation').value.trim(); // NEU: Ort abgreifen
 
-            if (!username || !password) {
-                responseDiv.textContent = 'Bitte Benutzername und Passwort eingeben.';
-                return;
-            }
-
-            try {
-                const res = await fetch(API_URL + '/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
+        try {
+            const res = await fetch(API_URL + '/register', {
+            method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, location }), // NEU: location mitsenden
+            });
+            // ... Rest bleibt gleich ...           
 
                 const data = await res.json().catch(() => ({}));
 
@@ -571,8 +672,124 @@
             }
         });
 
-        // ... (Alle Event-Listener bleiben wie gehabt, aber die Funktionen prüfen nun API_URL)
-        // ...
+    // Hilfsfunktion für Header mit Authentifizierung
+    function getAuthHeaders() {
+        const token = localStorage.getItem('safespeakToken');
+        return {
+            'Authorization': `Bearer ${token}`
+        };
+    }
+
+    // 1. NACHRICHT SENDEN (Inklusive Datei-Upload)
+    document.getElementById('messageForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+        if (!API_URL) return;
+
+        const receiverUsername = document.getElementById('receiverUsername').value.trim();
+        const content = document.getElementById('messageContent').value;
+        const fileInput = document.getElementById('file');
+
+        // Wir nutzen FormData, da wir eine Datei mitschicken könnten
+        const formData = new FormData();
+        formData.append('receiverUsername', receiverUsername);
+        formData.append('content', content);
+        if (fileInput.files[0]) {
+            formData.append('file', fileInput.files[0]);
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/send`, {
+                method: 'POST',
+                headers: getAuthHeaders(), // WICHTIG: Token mitsenden
+                body: formData
+            });
+
+            const data = await res.json();
+            if (res.ok) {
+                responseDiv.textContent = "Nachricht erfolgreich gesendet!";
+                document.getElementById('messageContent').value = ''; // Feld leeren
+                fileInput.value = ''; // Datei-Auswahl leeren
+                fetchAndDisplayMessages(); // Chat direkt aktualisieren
+            } else {
+                responseDiv.textContent = "Fehler: " + (data.message || data.error);
+            }
+        } catch (err) {
+            responseDiv.textContent = "Senden fehlgeschlagen: " + err.message;
+        }
+    });
+
+    // 2. NACHRICHTEN LADEN
+    async function fetchAndDisplayMessages() {
+        const chatPartner = document.getElementById('chatPartner').value.trim();
+        if (!chatPartner) {
+            alert("Bitte gib einen Chat-Partner an.");
+            return;
+        }
+
+        try {
+            const res = await fetch(`${API_URL}/messages?user2=${chatPartner}`, {
+                method: 'GET',
+                headers: getAuthHeaders()
+            });
+
+            if (!res.ok) throw new Error("Fehler beim Laden");
+
+            const messages = await res.json();
+            messagesDiv.innerHTML = ''; // Vorherige Nachrichten löschen
+
+            messages.forEach(msg => {
+                const p = document.createElement('p');
+                // Check wer der Absender ist (für die Optik)
+                const senderName = msg.sender_id === loggedInUser.id ? "Du" : chatPartner;
+            
+                let content = `<strong>${senderName}:</strong> ${msg.content}`;
+            
+                // Falls eine Datei dabei ist, Link generieren
+                if (msg.file_path) {
+                    const fileName = msg.file_path.split('/').pop();
+                    content += `<br><small>📎 Datei: <a href="#" onclick="downloadFile('${msg.file_path}')">${fileName}</a></small>`;
+                }
+            
+                p.innerHTML = content;
+                messagesDiv.appendChild(p);
+            });
+        
+            // Automatisch nach unten scrollen
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+
+        } catch (err) {
+            console.error(err);
+            messagesDiv.textContent = "Fehler beim Laden der Nachrichten.";
+        }
+    }
+
+    // 3. DATEI DOWNLOAD (Mit Token!)
+    async function downloadFile(filePath) {
+        try {
+            const res = await fetch(`${API_URL}/download/${encodeURIComponent(filePath)}`, {
+                headers: getAuthHeaders()
+            });
+        
+            if (res.ok) {
+                const blob = await res.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filePath.split('/').pop();
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } else {
+                alert("Download nicht erlaubt oder Datei nicht gefunden.");
+            }
+        } catch (err) {
+            alert("Download-Fehler.");
+        }
+    }
+
+    // Event-Listener für den Refresh-Button
+    document.getElementById('refreshButton').addEventListener('click', fetchAndDisplayMessages);
 </script>
 </body>
 </html>
