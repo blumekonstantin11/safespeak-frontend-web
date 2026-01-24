@@ -57,22 +57,30 @@
         }
 
         /* Style für Passwort-Auge */
-        .eye-icon {
+        .eye-wrapper {
             position: absolute; 
             right: 12px; 
             top: 50%;
-            transform: translateY(-50%); /* Zentriert das Auge vertikal perfekt */
+            transform: translateY(-50%);
             cursor: pointer; 
-            font-size: 1.4em;
-            user-select: none;
+            display: flex;
+            align-items: center;
             z-index: 10;
-            transition: transform 0.2s; /* Kleiner Effekt beim Drücken */
+            width: 24px;
+            height: 24px;
+            transition: opacity 0.2s;
         }
 
-        /* Damit es auf dem PC nicht so "alt" aussieht */
-        .eye-icon:hover {
-            filter: brightness(1.2);
+        .eye-wrapper:hover {
+            opacity: 0.7;
         }
+
+        .eye-wrapper svg {
+            width: 100%;
+            height: 100%;
+            fill: currentColor; /* Nutzt die Farbe, die wir im HTML definieren */
+        }
+
         /* Suchvorschläge Dropdown */
         #searchSuggestions {
             position: absolute; 
@@ -101,9 +109,10 @@
             <h2>Anmelden</h2>
             <form id="loginForm">
                 <input type="text" id="loginUsername" placeholder="Benutzername" required>
-                <div style="position: relative;">
-                    <input type="password" id="loginPassword" placeholder="Passwort" required>
-                    <span class="eye-icon" onclick="togglePassword('loginPassword')" style="color: #3498db; text-shadow: 0 0 2px rgba(0,0,0,0.1);">👁</span>
+                <div class="eye-wrapper" onclick="togglePassword('loginPassword')" style="color: #3498db;">
+                <svg viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
                 </div>
                 <button type="submit">Anmelden</button>
             </form>
@@ -123,10 +132,11 @@
                 <h2>Registrieren</h2>
                 <form id="registerForm">
                     <input type="text" id="regUsername" placeholder="Wunsch-Name" required>
-                    <div style="position: relative;">
-                        <input type="password" id="regPassword" placeholder="Passwort" required>
-                        <span class="eye-icon" onclick="togglePassword('regPassword')" style="color: #2ecc71; text-shadow: 0 0 2px rgba(0,0,0,0.1);">👁</span>
-                    </div>
+                    <div class="eye-wrapper" onclick="togglePassword('regPassword')" style="color: #2ecc71;">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                        </svg>
+                    </div>          
                     <input type="text" id="regStreet" placeholder="Straße und Hausnummer" required>
                     <input type="text" id="regZip" placeholder="PLZ" required>
                     <input type="text" id="regCity" placeholder="Stadt" required>
