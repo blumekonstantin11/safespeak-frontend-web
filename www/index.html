@@ -60,14 +60,19 @@
         .eye-icon {
             position: absolute; 
             right: 12px; 
-            top: 10px; 
+            top: 50%;
+            transform: translateY(-50%); /* Zentriert das Auge vertikal perfekt */
             cursor: pointer; 
-            font-style: normal;
-            font-size: 1.3em;
+            font-size: 1.4em;
             user-select: none;
             z-index: 10;
+            transition: transform 0.2s; /* Kleiner Effekt beim Drücken */
         }
 
+        /* Damit es auf dem PC nicht so "alt" aussieht */
+        .eye-icon:hover {
+            filter: brightness(1.2);
+        }
         /* Suchvorschläge Dropdown */
         #searchSuggestions {
             position: absolute; 
@@ -98,7 +103,7 @@
                 <input type="text" id="loginUsername" placeholder="Benutzername" required>
                 <div style="position: relative;">
                     <input type="password" id="loginPassword" placeholder="Passwort" required>
-                    <span class="eye-icon" onclick="togglePassword('loginPassword')" style="color: #3498db;">👁</span>
+                    <span class="eye-icon" onclick="togglePassword('loginPassword')" style="color: #3498db; text-shadow: 0 0 2px rgba(0,0,0,0.1);">👁</span>
                 </div>
                 <button type="submit">Anmelden</button>
             </form>
@@ -120,7 +125,7 @@
                     <input type="text" id="regUsername" placeholder="Wunsch-Name" required>
                     <div style="position: relative;">
                         <input type="password" id="regPassword" placeholder="Passwort" required>
-                        <span class="eye-icon" onclick="togglePassword('regPassword')" style="color: #2ecc71;">👁</span>
+                        <span class="eye-icon" onclick="togglePassword('regPassword')" style="color: #2ecc71; text-shadow: 0 0 2px rgba(0,0,0,0.1);">👁</span>
                     </div>
                     <input type="text" id="regStreet" placeholder="Straße und Hausnummer" required>
                     <input type="text" id="regZip" placeholder="PLZ" required>
