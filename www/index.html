@@ -251,6 +251,7 @@
     </style>
 </head>
 <body>
+    <script src="/socket.io/socket.io.js"></script>
     <div class="container">
         <div class="header">
             <h2 id="loggedInUsername"></h2>
@@ -336,6 +337,12 @@
         let API_URL = null; let messagePollingInterval = null; // Speichert den Timer
                             let lastMessageCount = 0; // Hilft uns, nur bei neuen Nachrichten zu scrollen 
         
+        const socket = io(); // Verbindet sich automatisch mit deinem Server
+
+        // Sobald die Verbindung steht
+        socket.on('connect', () => {
+            console.log("Verbunden mit dem Echtzeit-Server! ID:", socket.id);
+        });
         const responseDiv = document.getElementById('response');
         const authSection = document.getElementById('auth-section');
         const messageSection = document.getElementById('message-section');
@@ -424,6 +431,12 @@
             console.error("Fehler beim Laden der Kontakte:", err);
         }
     }
+
+        async function startCall() {
+            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            document.getElementById('localVideo').srcObject = stream;
+        }
+            
         async function fetchAndDisplayMessages(isBackground = false) {
             const chatPartner = document.getElementById('chatPartner').value.trim();
             if (!chatPartner) return;
@@ -477,6 +490,10 @@
                 loggedInUsernameEl.textContent = `Willkommen, ${username}! (Abmelden)`;
             }
             loadContacts();
+            // Dem Socket-Server sagen, wer wir sind
+            socket.emit('join', username);
+            console.log("Socket-Raum beigetreten als:", username);
+        }
 
             // Startet das Polling alle 3 Sekunden
             if (messagePollingInterval) clearInterval(messagePollingInterval);
@@ -486,7 +503,7 @@
                     fetchAndDisplayMessages(true); // "true" bedeutet: im Hintergrund laden
                 }
             }, 3000);
-        }
+
 
         function checkLoginStatus() {
             const username = localStorage.getItem('safespeakUsername');
@@ -622,6 +639,19 @@
             } catch (err) {
                 console.error(err);
                 responseDiv.textContent = 'Netzwerkfehler bei der Registrierung: ' + err.message;
+            }
+        });
+        // Wenn ein Anruf reinkommt
+        socket.on('incoming-call', (data) => {
+            const startCall = confirm(`Eingehender Videoanruf von ${data.from}. Möchtest du annehmen?`);
+    
+            if (startCall) {
+                console.log("Anruf wird vorbereitet...");
+                // Hier starten wir später die PeerJS-Logik
+                openVideoWindow(data.from, data.offer);
+            } else {
+                console.log("Anruf abgelehnt.");
+                // Optional: 'call-rejected' zurücksenden
             }
         });
 
