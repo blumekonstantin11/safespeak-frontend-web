@@ -11,7 +11,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            padding-top: calc(20px + env(safe-area-inset-top));
+            
         }
 
         .container {
@@ -19,217 +19,152 @@
             max-width: 600px;
             margin: 0 auto;
             background: #fff;
-            padding: 40px 15px 20px 15px;
-            box-sizing: border-box;
-
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        h1, h2 {
-            color: #2c3e50;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 10px;
-        }
-
-        form {
-            margin-bottom: 20px;
-            padding: 15px;
-            background: #ecf0f1;
-            border-radius: 5px;
-        }
-
-        input[type="text"],
-        input[type="password"],
-        input[type="number"],
-        textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        button:hover {
-            background-color: #2980b9;
-        }
-
-        #message-section {
-            display: none;
-            margin-top: 20px;
-        }
-
-        #messages {
-            border: 1px solid #ddd;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 5px;
-            max-height: 300px;
-            overflow-y: scroll;
-        }
-
-
-
-        .status {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            font-style: italic;
-            color: #555;
-            background: #fff3cd; 
-            padding: 10px;
-            border: 1px solid #ffeeba;
-            border-radius: 4px;
-            width: 100%;
-
-            box-sizing: border-box;
-        }
-
-        .password-container {
-            position: relative;
-            width: 100%; 
-            margin-bottom: 10px;
-
-        }
-
-        .password-container input {
-            padding-right: 40px;
-        }
-
-        .password-container .toggle-password {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-75%);
-            background: transparent;
-            border: none;
-            cursor: pointer;
-
-        }
-        
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-
-        }
-
-        #loggedInUsername {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #3498db;
-
-            cursor: pointer;
-        }
-
-        /* Dark Mode */
+        /* Dark Mode Styles */
         body.dark-mode { background-color: #2c3e50; color: #ecf0f1; }
-        .dark-mode .container { background: #34495e; }
+        .dark-mode .container { background: #34495e; color: white; }
+        .dark-mode h1, .dark-mode h2, .dark-mode h3 { color: #3498db; }
         .dark-mode form { background: #3a536b; }
-        .dark-mode input { background: #4a637d; color: white; border: 1px solid #777; }
+        .dark-mode input, .dark-mode textarea { background: #4a637d; color: white; border: 1px solid #777; }
+        .dark-mode #messages { background: #2c3e50; color: white; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        #loggedInUsername { font-weight: bold; color: #3498db; cursor: pointer; }
+        
+        form { margin-bottom: 20px; padding: 15px; background: #ecf0f1; border-radius: 5px; }
+        input, textarea { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 4px; border: 1px solid #ccc; box-sizing: border-box; }
+        button { background-color: #3498db; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; }
+        
+        .contact-button { display: block; width: 100%; text-align: left; margin: 5px 0; padding: 10px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; color: #333; }
+        .contact-button:hover { background: #e8f4fd; }
+
+        #messages { border: 1px solid #ddd; padding: 15px; background: #f9f9f9; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+        .status { font-style: italic; color: #555; background: #fff3cd; padding: 10px; border-radius: 4px; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <script src="/socket.io/socket.io.js"></script>
+
     <div class="container">
         <div class="header">
-            <h2 id="loggedInUsername"></h2>
-            <img src="SafeSpeak.png" alt="SafeSpeak Logo" id="theme-toggle-img" style="max-width: 50px; cursor: pointer;">
+            <h2 id="loggedInUsername" title="Klicken zum Abmelden"></h2>
+            <img src="SafeSpeak.png" alt="Logo" id="theme-toggle-img" style="max-width: 50px; cursor: pointer;">
         </div>    
         
         <div id="auth-section">
-            <h2>Benutzer registrieren</h2>
-            <form id="registerForm">
-                <input type="text" id="regUsername" placeholder="Benutzername" required>
-                <input type="text" id="regZip" placeholder="Postleitzahl (z.B. 50374)" required>
-                <input type="text" id="regCity" placeholder="Stadt (z.B. Erftstadt)" required>
-                <input type="text" id="regStreet" placeholder="Straße & Hausnummer" required>
-                
-                <div class="password-container">
-                    <input type="password" id="regPassword" placeholder="Passwort" required>
-                    <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
-                </div>
-                <button type="submit">Registrieren</button>
-            </form>
-
-            <hr>
-
-            <h2>Benutzer anmelden</h2>
+            <h2>Registrieren / Anmelden</h2>
             <form id="loginForm">
                 <input type="text" id="loginUsername" placeholder="Benutzername" required>
-                <div class="password-container">
-                    <input type="password" id="loginPassword" placeholder="Passwort" required>
-                    <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
-                </div>
+                <input type="password" id="loginPassword" placeholder="Passwort" required>
                 <button type="submit">Anmelden</button>
             </form>
-
-            <pre id="response" class="status"></pre>
+            <p>Noch kein Konto? Registrierung aktuell über die Konsole oder Backend-Pfad möglich.</p>
         </div>
 
-        <div id="suggestions-area" style="display: none; padding: 15px; background: #e8f4fd; border-radius: 5px; margin-bottom: 20px;">
-            <h3>Vorschläge & Kontakte</h3>
+        <div id="suggestions-area" style="display: none;">
+            <h3>Leute in deiner Nähe</h3>
             <div id="contact-list">Lade Kontakte...</div>
         </div>
 
-        <div id="message-section">
-            <h2>Chat</h2>
-            <form id="messageForm">
-                <input type="text" id="receiverUsername" placeholder="Empfänger" required>
-                <textarea id="messageContent" placeholder="Nachricht..." rows="2"></textarea>
-                <input type="file" id="file">
+        <div id="message-section" style="display: none;">
+            <hr>
+            <h2>Chat mit <span id="activePartner">...</span></h2>
+            <div id="messages"></div>
+            <form id="messageForm" style="margin-top:10px;">
+                <textarea id="messageContent" placeholder="Deine Nachricht..." required></textarea>
                 <button type="submit">Senden</button>
             </form>
 
-            <hr>
-            <input type="text" id="chatPartner" placeholder="Verlauf mit...">
-            <button id="refreshButton">Laden</button>
-            <div id="messages"></div>
         </div>
     </div>
 
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
-<script>
-    // Feste Definition der URLs, um den "null"-Fehler aus Screenshot 3 zu vermeiden
-    const RENDER_URL = 'https://safespeak-api-server.onrender.com';
-    const socket = io(RENDER_URL);
+    <script>
+        const API_URL = 'https://safespeak-api-server.onrender.com';
+        const socket = io(API_URL);
 
-    // Diese Funktion muss existieren, damit Screenshot 5 (Zeile 237) keinen Fehler wirft
-    async function loadContacts() {
-        try {
-            const token = localStorage.getItem('safespeakToken');
-            const res = await fetch(`${RENDER_URL}/contacts`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.status === 404) {
-                console.warn("Die Route /contacts fehlt noch im Backend!");
-                return;
-            }
-            const contacts = await res.json();
-            // ... Logik zum Anzeigen der Kontakte ...
-        } catch (err) {
-            console.error("Fehler beim Laden der Kontakte:", err);
+        let isDarkMode = localStorage.getItem('safespeakTheme') === 'dark';
+
+        // --- THEME ---
+        function applyTheme(dark) {
+            isDarkMode = dark;
+            document.body.classList.toggle('dark-mode', dark);
+            localStorage.setItem('safespeakTheme', dark ? 'dark' : 'light');
         }
-    }
 
-    // Deine Farbwechsel-Logik (muss nach dem Laden des DOMs definiert sein)
-    let isDarkMode = localStorage.getItem('safespeakTheme') === 'dark';
-    function updateTheme() {
-        document.body.classList.toggle('dark-mode', isDarkMode);
-    }
-    // ... restlicher Code ...
-</script>
+        document.getElementById('theme-toggle-img').onclick = () => applyTheme(!isDarkMode);
+
+        // --- UI WECHSEL ---
+        function applyLoggedInUI(username) {
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('suggestions-area').style.display = 'block';
+            document.getElementById('message-section').style.display = 'block';
+            document.getElementById('loggedInUsername').textContent = `Hi, ${username}!`;
+            loadContacts();
+        }
+
+        // --- LOGIN ---
+        document.getElementById('loginForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
+            });
+            const data = await res.json();
+            if (data.token) {
+                localStorage.setItem('safespeakToken', data.token);
+                localStorage.setItem('safespeakUsername', username);
+                applyLoggedInUI(username);
+            } else {
+                alert("Login fehlgeschlagen: " + data.error);
+            }
+        };
+
+        // --- KONTAKTE ---
+        async function loadContacts() {
+            const token = localStorage.getItem('safespeakToken');
+            const list = document.getElementById('contact-list');
+            try {
+                const res = await fetch(`${API_URL}/contacts`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const contacts = await res.json();
+                list.innerHTML = '';
+                contacts.forEach(user => {
+                    const btn = document.createElement('button');
+                    btn.className = 'contact-button';
+                    btn.textContent = `${user.username} (${user.location || 'In der Nähe'})`;
+                    btn.onclick = () => {
+                        document.getElementById('activePartner').textContent = user.username;
+                        // Hier könnte man fetchMessages(user.username) aufrufen
+                    };
+                    list.appendChild(btn);
+                });
+            } catch (err) {
+                list.innerHTML = 'Fehler beim Laden.';
+            }
+        }
+
+        // --- LOGOUT ---
+        document.getElementById('loggedInUsername').onclick = () => {
+            localStorage.clear();
+            location.reload();
+        };
+
+        // --- START ---
+        window.onload = () => {
+            applyTheme(isDarkMode);
+            const savedUser = localStorage.getItem('safespeakUsername');
+            if (savedUser) applyLoggedInUI(savedUser);
+        };
+    </script>
 </body>
 </html>
