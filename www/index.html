@@ -290,11 +290,9 @@
             <pre id="response" class="status"></pre>
         </div>
 
-        <div id="contacts-section">
-            <h2>Vorschläge & Kontakte</h2>
-            <div id="contact-list" style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px;">
-                </div>
-        </div>
+        <div id="suggestions-area" style="display: none;">
+            <h3>Vorschläge & Kontakte</h3>
+            </div>
 
         <div id="message-section">
             <h2>Nachricht senden</h2>
@@ -482,6 +480,19 @@
             }
         }
 
+        function updateUI(isLoggedIn) {
+            const loginSection = document.getElementById('login-section'); // Deine Formulare
+            const contactSection = document.getElementById('suggestions-area'); // Der Kontakte-Bereich
+
+            if (isLoggedIn) {
+                loginSection.style.display = 'none';
+                contactSection.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                contactSection.style.display = 'none';
+            }
+        }
+
         function applyLoggedInUI(username) {
             loggedInUser = { username: username, id: null };
             authSection.style.display = 'none';
@@ -490,6 +501,7 @@
                 loggedInUsernameEl.textContent = `Willkommen, ${username}! (Abmelden)`;
             }
             loadContacts();
+            document.getElementById('suggestions-area').style.display = 'block';
             // Dem Socket-Server sagen, wer wir sind
             socket.emit('join', username);
             console.log("Socket-Raum beigetreten als:", username);
