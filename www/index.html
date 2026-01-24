@@ -168,39 +168,36 @@
 
         document.getElementById('registerForm').onsubmit = async (e) => {
             e.preventDefault();
-            const statusDiv = document.getElementById('addressCheckStatus');
+            const terminal = document.getElementById('terminal-status');
             const regBtn = document.getElementById('regBtn');
     
+            const username = document.getElementById('regUsername').value;
+            const password = document.getElementById('regPassword').value;
             const street = document.getElementById('regStreet').value;
             const zip = document.getElementById('regZip').value;
             const city = document.getElementById('regCity').value;
 
-            statusDiv.textContent = "Prüfe Adresse...";
-            statusDiv.style.color = "orange";
+            terminal.textContent = "> Initialisiere Adress-Verifizierung...";
+            terminal.style.color = "#00ff00";
             regBtn.disabled = true;
 
-            // 1. ADRESS-PRÜFUNG via OpenStreetMap (Nominatim)
+
             try {
                 const checkRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&street=${encodeURIComponent(street)}&postalcode=${encodeURIComponent(zip)}&city=${encodeURIComponent(city)}&country=Germany`);
                 const checkData = await checkRes.json();
 
-                if (checkData.length === 0) {
-                    statusDiv.textContent = "Fehler: Diese Adresse wurde nicht gefunden!";
-                    statusDiv.style.color = "red";
+            if (checkData.length === 0) {
+                    terminal.textContent = "> KRITISCHER FEHLER: Adresse nicht im System gefunden.";
+                    terminal.style.color = "#ff4444";
                     regBtn.disabled = false;
                     return;
                 }
-
-                statusDiv.textContent = "Adresse verifiziert!";
-                statusDiv.style.color = "green";
+                terminal.textContent = "> Adresse verifiziert. Erstelle Benutzerprofil...";
             } catch (err) {
-                console.error("Adress-Check Fehler", err);
-            // Falls die API down ist, lassen wir die Registrierung zur Sicherheit trotzdem zu
+                terminal.textContent = "> WARNUNG: Adress-Server nicht erreichbar. Fahre fort...";
             }
 
-            // 2. EIGENTLICHE REGISTRIERUNG
-            const username = document.getElementById('regUsername').value;
-            const password = document.getElementById('regPassword').value;
+            
 
             const res = await fetch(`${API_URL}/register`, {
                 method: 'POST',
@@ -210,10 +207,16 @@
     
             const data = await res.json();
             if (data.userId) {
-                alert("Erfolgreich registriert!");
-                location.reload();
+                terminal.textContent = "> ERFOLG: Account erstellt! Bitte jetzt anmelden.";
+                terminal.style.color = "#00ff00";
+                // Formular verstecken nach Erfolg
+                setTimeout(() => {
+                    document.getElementById('register-container').style.display = 'none';
+                    document.getElementById('reg-toggle-area').style.display = 'block';
+                }, 3000);
             } else {
-                alert("Fehler: " + data.error);
+                terminal.textContent = "> FEHLER: " + (data.error || "Name bereits vergeben.");
+                terminal.style.color = "#ff4444";
                 regBtn.disabled = false;
             }
         };
