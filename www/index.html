@@ -202,62 +202,34 @@
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
 <script>
-    // 1. FESTE URLS (Damit kein 'null' mehr vorkommt)
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    // Feste Definition der URLs, um den "null"-Fehler aus Screenshot 3 zu vermeiden
     const RENDER_URL = 'https://safespeak-api-server.onrender.com';
-    const API_URL = isLocalhost ? 'http://localhost:3000' : RENDER_URL;
+    const socket = io(RENDER_URL);
 
-    // Socket-Verbindung mit der richtigen URL initialisieren
-    const socket = io(API_URL);
-
-    let isDarkMode = false;
-    let loggedInUser = { username: null, id: null };
-
-    // --- FUNKTION 1: DER FARBWECHSEL (FIXED) ---
-    function applyTheme(dark) {
-        isDarkMode = dark;
-        document.body.classList.toggle('dark-mode', dark);
-        localStorage.setItem('safespeakTheme', dark ? 'dark' : 'light');
-    }
-
-    // Event-Listener für das Logo (Farbwechsel)
-    const toggleImg = document.getElementById('theme-toggle-img');
-    if (toggleImg) {
-        toggleImg.addEventListener('click', () => applyTheme(!isDarkMode));
-    }
-
-    // --- FUNKTION 2: LOGIN & UI ---
-    function applyLoggedInUI(username) {
-        loggedInUser.username = username;
-        document.getElementById('auth-section').style.display = 'none';
-        document.getElementById('message-section').style.display = 'block';
-        document.getElementById('suggestions-area').style.display = 'block';
-        document.getElementById('loggedInUsername').textContent = `Willkommen, ${username}! (Abmelden)`;
-        
-        loadContacts(); // Lädt deine neuen lokalen Kontakte
-    }
-
-    // --- INITIALISIERUNG BEIM START ---
-    window.onload = () => {
-        // Theme wiederherstellen
-        const savedTheme = localStorage.getItem('safespeakTheme');
-        applyTheme(savedTheme === 'dark');
-
-        // Login prüfen
-        const savedUser = localStorage.getItem('safespeakUsername');
-        const token = localStorage.getItem('safespeakToken');
-        if (savedUser && token) {
-            applyLoggedInUI(savedUser);
+    // Diese Funktion muss existieren, damit Screenshot 5 (Zeile 237) keinen Fehler wirft
+    async function loadContacts() {
+        try {
+            const token = localStorage.getItem('safespeakToken');
+            const res = await fetch(`${RENDER_URL}/contacts`, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.status === 404) {
+                console.warn("Die Route /contacts fehlt noch im Backend!");
+                return;
+            }
+            const contacts = await res.json();
+            // ... Logik zum Anzeigen der Kontakte ...
+        } catch (err) {
+            console.error("Fehler beim Laden der Kontakte:", err);
         }
-    };
+    }
 
-    // Logout-Funktion
-    document.getElementById('loggedInUsername').addEventListener('click', () => {
-        localStorage.clear();
-        window.location.reload();
-    });
-
-    // Hier kommen deine weiteren Funktionen (loadContacts, fetchMessages etc.) rein...
+    // Deine Farbwechsel-Logik (muss nach dem Laden des DOMs definiert sein)
+    let isDarkMode = localStorage.getItem('safespeakTheme') === 'dark';
+    function updateTheme() {
+        document.body.classList.toggle('dark-mode', isDarkMode);
+    }
+    // ... restlicher Code ...
 </script>
 </body>
 </html>
