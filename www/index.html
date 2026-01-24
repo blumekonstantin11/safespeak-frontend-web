@@ -54,16 +54,26 @@
             <img src="SafeSpeak.png" alt="Logo" id="theme-toggle-img" style="max-width: 50px; cursor: pointer;">
         </div>    
         
-        <div id="auth-section">
-            <h2>Anmelden</h2>
-            <form id="loginForm">
-                <input type="text" id="loginUsername" placeholder="Benutzername" required>
-                <input type="password" id="loginPassword" placeholder="Passwort" required>
-                <button type="submit">Anmelden</button>
-            </form>
+    <div id="auth-section">
+        <h2>Anmelden</h2>
+        <form id="loginForm">
+            <input type="text" id="loginUsername" placeholder="Benutzername" required>
+            <input type="password" id="loginPassword" placeholder="Passwort" required>
+            <button type="submit">Anmelden</button>
+        </form>
 
-            <hr style="margin: 20px 0;">
+        <div id="terminal-status" style="background: #1e1e1e; color: #00ff00; font-family: 'Courier New', monospace; font-size: 0.8em; padding: 8px; border-radius: 4px; margin-top: 10px; min-height: 1.2em;">
+            Bereit...
+        </div>
 
+        <hr style="margin: 20px 0;">
+
+        <div id="reg-toggle-area">
+            <p>Noch kein Konto?</p>
+            <button onclick="toggleRegister()" style="background-color: #7f8c8d;">Jetzt Registrieren</button>
+        </div>
+
+        <div id="register-container" style="display: none; margin-top: 20px;">
             <h2>Registrieren</h2>
             <form id="registerForm">
                 <input type="text" id="regUsername" placeholder="Wunsch-Name" required>
@@ -75,6 +85,7 @@
                 <button type="submit" id="regBtn" style="background-color: #2ecc71;">Konto erstellen</button>
             </form>
         </div>
+    </div>
 
         <div id="suggestions-area" style="display: none;">
             <h3>Leute in deiner Nähe</h3>
@@ -125,24 +136,32 @@
             loadContacts();
         }
 
-        // --- LOGIN ---
+        
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
+            const terminal = document.getElementById('terminal-status');
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
+
+            terminal.textContent = "> Verbinde mit SafeSpeak-Core...";
 
             const res = await fetch(`${API_URL}/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
+    
             const data = await res.json();
+    
             if (data.token) {
+                terminal.textContent = "> Zugriff gewährt. Initialisiere Session...";
                 localStorage.setItem('safespeakToken', data.token);
                 localStorage.setItem('safespeakUsername', username);
-                applyLoggedInUI(username);
+                setTimeout(() => applyLoggedInUI(username), 500);
             } else {
-                alert("Login fehlgeschlagen: " + data.error);
+                terminal.textContent = "> FEHLER: " + (data.error || "Login fehlgeschlagen");
+                terminal.style.color = "#ff4444";
+                setTimeout(() => { terminal.style.color = "#00ff00"; }, 2000);
             }
         };
 
@@ -198,6 +217,16 @@
                 regBtn.disabled = false;
             }
         };
+
+        function toggleRegister() {
+            const container = document.getElementById('register-container');
+            const toggleArea = document.getElementById('reg-toggle-area');
+    
+            if (container.style.display === 'none') {
+                container.style.display = 'block';
+                toggleArea.style.display = 'none'; // Versteckt den "Jetzt Registrieren" Button
+            }
+        }
 
             // --- NACHRICHTEN LADEN (Neu hinzugefügt) ---
             async function fetchMessages(partnerName) {
