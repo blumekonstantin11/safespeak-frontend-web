@@ -11,7 +11,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            
+
         }
 
         .container {
@@ -61,7 +61,23 @@
                 <input type="password" id="loginPassword" placeholder="Passwort" required>
                 <button type="submit">Anmelden</button>
             </form>
-            <p>Noch kein Konto? Registrierung aktuell über die Konsole oder Backend-Pfad möglich.</p>
+            <div id="auth-section">
+                <h2>Anmelden</h2>
+                    <form id="loginForm">
+                        <input type="text" id="loginUsername" placeholder="Benutzername" required>
+                        <input type="password" id="loginPassword" placeholder="Passwort" required>
+                    <button type="submit">Anmelden</button>
+                </form>
+
+                <hr>
+                <h2>Registrieren</h2>
+                    <form id="registerForm">
+                    <input type="text" id="regUsername" placeholder="Wunsch-Name" required>
+                    <input type="password" id="regPassword" placeholder="Passwort" required>
+                    <input type="text" id="regLocation" placeholder="PLZ (z.B. 12345)" required>
+                    <button type="submit" style="background-color: #2ecc71;">Konto erstellen</button>
+                </form>
+            </div>
         </div>
 
         <div id="suggestions-area" style="display: none;">
@@ -84,8 +100,10 @@
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
     <script>
-        const API_URL = 'https://safespeak-api-server.onrender.com';
-        const socket = io(API_URL);
+        const API_URL = "https://safespeak-api-server.onrender.com";
+        const socket = io("https://safespeak-api-server.onrender.com", {
+        transports: ["websocket"] // Wichtig für Render, da Polling oft Probleme macht
+    });
 
         let isDarkMode = localStorage.getItem('safespeakTheme') === 'dark';
 
@@ -98,12 +116,16 @@
 
         document.getElementById('theme-toggle-img').onclick = () => applyTheme(!isDarkMode);
 
-        // --- UI WECHSEL ---
+
         function applyLoggedInUI(username) {
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('suggestions-area').style.display = 'block';
             document.getElementById('message-section').style.display = 'block';
             document.getElementById('loggedInUsername').textContent = `Hi, ${username}!`;
+    
+            // DEM SERVER SAGEN, WER ICH BIN (WICHTIG!)
+            socket.emit('join', username); 
+    
             loadContacts();
         }
 
@@ -128,30 +150,127 @@
             }
         };
 
-        // --- KONTAKTE ---
-        async function loadContacts() {
-            const token = localStorage.getItem('safespeakToken');
-            const list = document.getElementById('contact-list');
-            try {
-                const res = await fetch(`${API_URL}/contacts`, {
+            // --- REGISTRIERUNG (Neu hinzugefügt) ---
+            document.getElementById('registerForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('regUsername').value;
+                const password = document.getElementById('regPassword').value;
+                const location = document.getElementById('regLocation').value;
+
+                const res = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password, location })
+                });
+                    const data = await res.json();
+                if (data.success || data.userId) {
+                    alert("Registrierung erfolgreich! Du kannst dich jetzt anmelden.");
+                } else {
+                    alert("Fehler: " + data.error);
+                }
+            };
+
+            // --- NACHRICHTEN LADEN (Neu hinzugefügt) ---
+            async function fetchMessages(partnerName) {
+                const token = localStorage.getItem('safespeakToken');
+                const res = await fetch(`${API_URL}/messages?withUser=${partnerName}`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
-                const contacts = await res.json();
-                list.innerHTML = '';
-                contacts.forEach(user => {
-                    const btn = document.createElement('button');
-                    btn.className = 'contact-button';
-                    btn.textContent = `${user.username} (${user.location || 'In der Nähe'})`;
-                    btn.onclick = () => {
-                        document.getElementById('activePartner').textContent = user.username;
-                        // Hier könnte man fetchMessages(user.username) aufrufen
-                    };
-                    list.appendChild(btn);
+                const messages = await res.json();
+                const container = document.getElementById('messages');
+                container.innerHTML = '';
+    
+                messages.forEach(msg => {
+                    const div = document.createElement('div');
+                    div.style.marginBottom = "5px";
+                    div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+                    container.appendChild(div);
                 });
-            } catch (err) {
-                list.innerHTML = 'Fehler beim Laden.';
+                container.scrollTop = container.scrollHeight;
             }
-        }
+
+            // --- NACHRICHT SENDEN ---
+            document.getElementById('messageForm').onsubmit = async (e) => {
+                e.preventDefault();
+                const content = document.getElementById('messageContent').value;
+                const receiver = document.getElementById('activePartner').textContent;
+                const token = localStorage.getItem('safespeakToken');
+
+                if (receiver === "...") {
+                    alert("Bitte wähle zuerst einen Kontakt aus!");
+                    return;
+                }
+
+                // Nachricht via Socket senden (für Echtzeit)
+                socket.emit('private_message', {
+                    to: receiver,
+                    content: content,
+                    token: token
+                });
+
+                // Feld leeren
+                document.getElementById('messageContent').value = '';
+    
+                // Nachricht lokal sofort anzeigen
+                const container = document.getElementById('messages');
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>Ich:</strong> ${content}`;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+            };
+
+            // --- ECHTZEIT-EMPFANG ---
+            socket.on('new_message', (msg) => {
+                const activePartner = document.getElementById('activePartner').textContent;
+                // Nur anzeigen, wenn wir gerade mit dieser Person chatten
+                if (msg.sender === activePartner) {
+                    const container = document.getElementById('messages');
+                    const div = document.createElement('div');
+                    div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+                    container.appendChild(div);
+                    container.scrollTop = container.scrollHeight;
+                } else {
+                    alert("Neue Nachricht von " + msg.sender);
+                }
+            });
+
+            // --- KONTAKTE (Update der Klick-Funktion) ---
+            async function loadContacts() {
+                const token = localStorage.getItem('safespeakToken');
+                const list = document.getElementById('contact-list');
+                try {
+                    const res = await fetch(`${API_URL}/contacts`, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    const contacts = await res.json();
+                    list.innerHTML = '';
+                    contacts.forEach(user => {
+                        const btn = document.createElement('button');
+                        btn.className = 'contact-button';
+                        btn.textContent = `${user.username} (PLZ: ${user.location})`;
+                        btn.onclick = () => {
+                            document.getElementById('activePartner').textContent = user.username;
+                            fetchMessages(user.username); // <--- Jetzt aktiv!
+                        };
+                        list.appendChild(btn);
+                    });
+                } catch (err) {
+                    list.innerHTML = 'Fehler beim Laden der Kontakte.';
+                }
+            }
+
+        socket.on('new_message', (msg) => {
+            const activePartner = document.getElementById('activePartner').textContent;
+            if (msg.sender === activePartner) {
+                const container = document.getElementById('messages');
+                const div = document.createElement('div');
+                div.innerHTML = `<strong>${msg.sender}:</strong> ${msg.content}`;
+                container.appendChild(div);
+                container.scrollTop = container.scrollHeight;
+            } else {
+                alert("Neue Nachricht von " + msg.sender);
+            }
+        });
 
         // --- LOGOUT ---
         document.getElementById('loggedInUsername').onclick = () => {
