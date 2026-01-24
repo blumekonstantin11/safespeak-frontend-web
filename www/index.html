@@ -15,12 +15,11 @@
         }
 
         .container {
-            /* Entfernen Sie die feste max-width, um sich an Mobilgeräte anzupassen */
-            width: 95%; /* Setzt die Breite auf 95% des Bildschirms */
-            max-width: 600px; /* Schränkt die Größe auf großen Bildschirmen ein */
+            width: 95%;
+            max-width: 600px;
             margin: 0 auto;
             background: #fff;
-            padding: 40px 5px 20px 5px; /* Reduzierter horizontaler Rand für Handys */
+            padding: 40px 15px 20px 15px;
             box-sizing: border-box;
 
             border-radius: 8px;
@@ -44,11 +43,12 @@
         input[type="password"],
         input[type="number"],
         textarea {
-            width: 95%; /* MUSS 95% BLEIBEN */
+            width: 100%;
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
+            box-sizing: border-box;
         }
         
         button {
@@ -78,176 +78,66 @@
             max-height: 300px;
             overflow-y: scroll;
         }
-        
-        #messages p {
-            margin: 0 0 10px 0;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        #messages p:last-child {
-            border-bottom: none;
-        }
+
+
 
         .status {
-            margin-top: 20px; /* Sicherstellen, dass Abstand zum Anmeldebutton besteht */
-            margin-bottom: 20px; /* Fügen Sie unten Abstand hinzu */
+            margin-top: 20px;
+            margin-bottom: 20px;
             font-style: italic;
             color: #555;
             background: #fff3cd; 
             padding: 10px;
             border: 1px solid #ffeeba;
             border-radius: 4px;
-            /* Fügen Sie width: 100% hinzu, um sicherzustellen, dass es die volle Breite einnimmt */
-            width: 100%; 
-            box-sizing: border-box; /* Stellt sicher, dass Padding in der Breite enthalten ist */
+            width: 100%;
+
+            box-sizing: border-box;
         }
 
-        hr {
-            border: 0;
-            height: 1px;
-            background: #ccc;
-            margin: 20px 0;
-        }
-        
         .password-container {
             position: relative;
-            /* width: 95%; BEIBEHALTEN, damit es die gleiche Basisbreite wie die anderen Inputs hat */
-            width: 95%; 
+            width: 100%; 
             margin-bottom: 10px;
-            box-sizing: border-box; 
+
         }
 
         .password-container input {
-            width: 80%;
-            padding-right: 10px;
-            box-sizing: border-box;
+            padding-right: 40px;
         }
 
         .password-container .toggle-password {
             position: absolute;
-            right: 3px;
+            right: 5px;
             top: 50%;
-            transform: translateY(-50%);
+            transform: translateY(-75%);
             background: transparent;
             border: none;
             cursor: pointer;
-            font-size: 1.2em;
-            padding: 0;
-            z-index: 2;
+
         }
         
         .header {
             display: flex;
-            justify-content: space-between; /* Abstand zwischen Logo und Username */
-            align-items: flex-start; /* Startet oben */
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
-            flex-wrap: wrap; 
+
         }
 
         #loggedInUsername {
-            font-size: 1.5em;
+            font-size: 1.2em;
             font-weight: bold;
             color: #3498db;
-            margin-right: auto;
-            cursor: pointer; /* Klickbar für Logout */
-        }
 
-        .theme-switch {
-            display: inline-block;
-            height: 34px;
-            position: relative;
-            width: 60px;
-        }
-
-        .theme-switch input {
-            display: none;
-        }
-
-        .slider {
-            background-color: #ccc;
-            bottom: 0;
             cursor: pointer;
-            left: 0;
-            position: absolute;
-            right: 0;
-            top: 0;
-            transition: .4s;
         }
 
-        .slider:before {
-            background-color: #fff;
-            bottom: 4px;
-            content: "";
-            height: 26px;
-            left: 4px;
-            position: absolute;
-            transition: .4s;
-            width: 26px;
-        }
-
-        input:checked+.slider {
-            background-color: #2196f3;
-        }
-
-        input:checked+.slider:before {
-            transform: translateX(26px);
-        }
-
-        .slider.round {
-            border-radius: 34px;
-        }
-
-        .slider.round:before {
-            border-radius: 50%;
-        }
-
-        /* Styling für den dunklen Modus */
-        body.dark-mode {
-            background-color: #2c3e50;
-            color: #ecf0f1; 
-        }
-
-        .dark-mode .container {
-            background: #34495e;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .dark-mode h1, .dark-mode h2 {
-            color: #ecf0f1;
-            border-bottom: 2px solid #555;
-        }
-
-        /* ... andere dunkle Modus-Regeln ... */
-
-        .dark-mode #messages {
-            background: #3a536b; /* Dunklerer Hintergrund für Nachrichtenbox */
-            border: 1px solid #4a637d;
-        }
-
-        .dark-mode #messages p {
-            color: #ecf0f1; /* Helle Textfarbe für Nachrichten */
-            border-bottom: 1px solid #4a637d; /* Hellerer Trennstrich */
-        }
-
-        .dark-mode form {
-            background: #3a536b;
-        }
-
-        .dark-mode input[type="text"],
-        .dark-mode input[type="password"],
-        .dark-mode input[type="number"],
-        .dark-mode textarea {
-            background-color: #4a637d;
-            border: 1px solid #777;
-            color: #ecf0f1;
-        }
-
-        .dark-mode .status {
-            background: #3a536b;
-            border: 1px solid #4a637d;
-            color: #ecf0f1;
-        }
+        /* Dark Mode */
+        body.dark-mode { background-color: #2c3e50; color: #ecf0f1; }
+        .dark-mode .container { background: #34495e; }
+        .dark-mode form { background: #3a536b; }
+        .dark-mode input { background: #4a637d; color: white; border: 1px solid #777; }
     </style>
 </head>
 <body>
@@ -255,19 +145,17 @@
     <div class="container">
         <div class="header">
             <h2 id="loggedInUsername"></h2>
-
-            <img src="SafeSpeak.png" 
-                 alt="SafeSpeak Logo" 
-                 id="theme-toggle-img"
-                 style="max-width: 70px; height: auto; display: block; cursor: pointer; margin-right: 15px;">
-
+            <img src="SafeSpeak.png" alt="SafeSpeak Logo" id="theme-toggle-img" style="max-width: 50px; cursor: pointer;">
         </div>    
         
         <div id="auth-section">
             <h2>Benutzer registrieren</h2>
             <form id="registerForm">
-                <input type="text" id="regUsername" placeholder="Benutzername" required><br>
-                <input type="text" id="regLocation" placeholder="Dein Ort (z.B. Berlin)">
+                <input type="text" id="regUsername" placeholder="Benutzername" required>
+                <input type="text" id="regZip" placeholder="Postleitzahl (z.B. 50374)" required>
+                <input type="text" id="regCity" placeholder="Stadt (z.B. Erftstadt)" required>
+                <input type="text" id="regStreet" placeholder="Straße & Hausnummer" required>
+                
                 <div class="password-container">
                     <input type="password" id="regPassword" placeholder="Passwort" required>
                     <button type="button" class="toggle-password" data-target="regPassword">👁️</button>
@@ -279,7 +167,7 @@
 
             <h2>Benutzer anmelden</h2>
             <form id="loginForm">
-                <input type="text" id="loginUsername" placeholder="Benutzername" required><br>
+                <input type="text" id="loginUsername" placeholder="Benutzername" required>
                 <div class="password-container">
                     <input type="password" id="loginPassword" placeholder="Passwort" required>
                     <button type="button" class="toggle-password" data-target="loginPassword">👁️</button>
@@ -290,133 +178,69 @@
             <pre id="response" class="status"></pre>
         </div>
 
-        <div id="suggestions-area" style="display: none;">
+        <div id="suggestions-area" style="display: none; padding: 15px; background: #e8f4fd; border-radius: 5px; margin-bottom: 20px;">
             <h3>Vorschläge & Kontakte</h3>
-            </div>
+            <div id="contact-list">Lade Kontakte...</div>
+        </div>
 
         <div id="message-section">
-            <h2>Nachricht senden</h2>
-            <form id="messageForm" enctype="multipart/form-data">
-                <input type="text" id="receiverUsername" placeholder="Empfänger-Username" required><br>
-                <textarea id="messageContent" placeholder="Nachricht" rows="2"></textarea><br>
-                <label for="file">Datei auswählen:</label>
-                <input type="file" id="file" name="file"><br>
-                <button type="submit">Nachricht senden</button>
+            <h2>Chat</h2>
+            <form id="messageForm">
+                <input type="text" id="receiverUsername" placeholder="Empfänger" required>
+                <textarea id="messageContent" placeholder="Nachricht..." rows="2"></textarea>
+                <input type="file" id="file">
+                <button type="submit">Senden</button>
             </form>
 
             <hr>
-
-            <h2>Eingegangene Nachrichten</h2>
-            <input type="text" id="chatPartner" placeholder="Username des Chat-Partners" required>
-            <button id="refreshButton">Nachrichten laden</button>
-            <pre id="messages"></pre>
-            <div></div>
-         
-        <pre id="response" class="status"></pre>
-
+            <input type="text" id="chatPartner" placeholder="Verlauf mit...">
+            <button id="refreshButton">Laden</button>
+            <div id="messages"></div>
         </div>
-        <script>
-        // Liste aller möglichen Server-URLs.
-        // Lokal nutzen wir localhost, in Produktion nur die öffentliche Render-URL.
-        const isLocalhost =
-            window.location.hostname === 'localhost' ||
-            window.location.hostname === '127.0.0.1';
+    </div>
 
-        const POSSIBLE_API_URLS = isLocalhost
-            ? [
-                'http://localhost:3000', // Lokaler Entwicklungsserver
-            ]
-            : [
-                'https://safespeak-api-server.onrender.com', // Öffentliche Render-URL für Produktion
-                // 'https://safespeak-api-server-xyz.onrender.com', // Optionaler Fallback, derzeit deaktiviert (CORS)
-            ];
-        
-        // Diese Variable wird die funktionierende URL speichern, sobald sie gefunden wurde
-        let API_URL = null; let messagePollingInterval = null; // Speichert den Timer
-                            let lastMessageCount = 0; // Hilft uns, nur bei neuen Nachrichten zu scrollen 
-        
-        const socket = io(); // Verbindet sich automatisch mit deinem Server
-
-        // Sobald die Verbindung steht
-        socket.on('connect', () => {
-            console.log("Verbunden mit dem Echtzeit-Server! ID:", socket.id);
-        });
-        const responseDiv = document.getElementById('response');
-        const authSection = document.getElementById('auth-section');
-        const messageSection = document.getElementById('message-section');
-        const messagesDiv = document.getElementById('messages');
-        let loggedInUser = null; 
-        
-        /**
-         * Prüft alle möglichen URLs und setzt die funktionierende URL.
-         * Muss vor allen anderen API-Aufrufen ausgeführt werden.
-         */
-        async function findApiUrl() {
-            responseDiv.textContent = 'Suche nach dem Server...';
-            for (const url of POSSIBLE_API_URLS) {
-                try {
-                    // Wir testen die Basis-Route '/'
-                    const res = await fetch(url + '/', { method: 'GET', signal: AbortSignal.timeout(3000) }); // Timeout nach 3s
-                    
-                    if (res.ok) {
-                        API_URL = url;
-                        console.log(`Server gefunden unter: ${API_URL}`);
-                        responseDiv.textContent = `Server gefunden. URL: ${API_URL}`;
-                        return true; // Funktion beenden, URL gefunden
-                    }
-                } catch (error) {
-                    console.warn(`URL ${url} nicht erreichbar oder Timeout.`);
-                }
-            }
-            
-            responseDiv.textContent = 'FEHLER: Kein SafeSpeak-Server unter den bekannten URLs gefunden. Bitte URL im Client prüfen.';
-            return false; // Keine URL gefunden
-        }
-
-
-        // WICHTIG: Die Initialisierung und der Login-Check müssen warten, bis die URL gefunden ist!
-        async function initializeApp() {
-            // Theme aus localStorage wiederherstellen
-            loadInitialTheme();
-
-            const urlFound = await findApiUrl();
-            if (urlFound) {
-                checkLoginStatus(); // Nur fortfahren, wenn Server gefunden
-            }
-        }
-        window.onload = initializeApp; // STARTET JETZT DIE PRÜFUNG DER URLs
-
-        // --- Der Rest deines Codes folgt hier ---
-
-        const loggedInUsernameEl = document.getElementById('loggedInUsername');
-
-        async function loadContacts() {
-            if (!API_URL) return;
+<script>
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const POSSIBLE_API_URLS = isLocalhost ? ['http://localhost:3000'] : ['https://safespeak-api-server.onrender.com'];
     
+    let API_URL = null;
+    let loggedInUser = { username: null, id: null };
+    let messagePollingInterval = null;
+    let lastMessageCount = 0;
+
+    const socket = typeof io !== 'undefined' ? io() : null;
+    const responseDiv = document.getElementById('response');
+    const authSection = document.getElementById('auth-section');
+    const messageSection = document.getElementById('message-section');
+    const suggestionsArea = document.getElementById('suggestions-area');
+    const messagesDiv = document.getElementById('messages');
+    const loggedInUsernameEl = document.getElementById('loggedInUsername');
+
+    async function findApiUrl() {
+        for (const url of POSSIBLE_API_URLS) {
+            try {
+                const res = await fetch(url + '/', { method: 'GET' });
+                if (res.ok) { API_URL = url; return true; }
+            } catch (e) { console.warn("Server nicht erreichbar unter " + url); }
+        }
+        return false;
+    }
+
+    function getAuthHeaders() {
+        return { 'Authorization': `Bearer ${localStorage.getItem('safespeakToken')}`, 'Content-Type': 'application/json' };
+    }
+
+    async function loadContacts() {
         try {
-            const res = await fetch(`${API_URL}/contacts`, {
-                method: 'GET',
-                headers: getAuthHeaders()
-            });
-        
+            const res = await fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() });
             if (res.ok) {
                 const contacts = await res.json();
                 const list = document.getElementById('contact-list');
-                list.innerHTML = ''; // Leeren
-            
-                if (contacts.length === 0) {
-                    list.innerHTML = '<small>Keine Kontakte in der Nähe gefunden.</small>';
-                    return;
-                }
-
+                list.innerHTML = '';
                 contacts.forEach(user => {
                     const btn = document.createElement('button');
-                    btn.style.fontSize = '12px';
-                    btn.style.padding = '5px 10px';
-                    btn.style.backgroundColor = '#27ae60';
-                    btn.textContent = `${user.username} (${user.location || '?'})`;
-                
-                    // Klick setzt den Empfänger automatisch
+                    btn.textContent = `${user.username} (${user.location || 'Unbekannt'})`;
+                    btn.style.margin = "5px";
                     btn.onclick = () => {
                         document.getElementById('receiverUsername').value = user.username;
                         document.getElementById('chatPartner').value = user.username;
@@ -425,413 +249,110 @@
                     list.appendChild(btn);
                 });
             }
-        } catch (err) {
-            console.error("Fehler beim Laden der Kontakte:", err);
-        }
+        } catch (err) { console.error("Kontaktfehler", err); }
     }
 
-        async function startCall() {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            document.getElementById('localVideo').srcObject = stream;
-        }
-            
-        async function fetchAndDisplayMessages(isBackground = false) {
-            const chatPartner = document.getElementById('chatPartner').value.trim();
-            if (!chatPartner) return;
+    function applyLoggedInUI(username) {
+        loggedInUser.username = username;
+        authSection.style.display = 'none';
+        messageSection.style.display = 'block';
+        suggestionsArea.style.display = 'block';
+        loggedInUsernameEl.textContent = `Willkommen, ${username} (Logout)`;
+        if(socket) socket.emit('join', username);
+        loadContacts();
+        startPolling();
+    }
 
-            try {
-                const res = await fetch(`${API_URL}/messages?user2=${chatPartner}`, {
-                    method: 'GET',
-                    headers: getAuthHeaders()
-                });
+    function startPolling() {
+        if(messagePollingInterval) clearInterval(messagePollingInterval);
+        messagePollingInterval = setInterval(() => {
+            if(document.getElementById('chatPartner').value) fetchAndDisplayMessages(true);
+        }, 3000);
+    }
 
-                if (!res.ok) throw new Error("Fehler beim Laden");
-
-                const messages = await res.json();
-        
-                // Nur UI updaten, wenn sich die Anzahl der Nachrichten geändert hat
-                if (messages.length !== lastMessageCount) {
-                    messagesDiv.innerHTML = ''; 
-            
-                    messages.forEach(msg => {
-                        const p = document.createElement('p');
-                        // Wir nutzen hier die IDs aus der Datenbank
-                        const isMe = (msg.sender_id === loggedInUser.id);
-                        const senderName = isMe ? "Du" : chatPartner;
-                
-                        let content = `<strong>${senderName}:</strong> ${msg.content}`;
-                        if (msg.file_path) {
-                        const fileName = msg.file_path.split('/').pop();
-                        content += `<br><small>📎 <a href="#" onclick="downloadFile('${msg.file_path}')">${fileName}</a></small>`;
-                        }
-                
-                        p.innerHTML = content;
-                        // Optional: Eigene Nachrichten leicht anders färben
-                        if(isMe) p.style.color = "#3498db"; 
-                
-                        messagesDiv.appendChild(p);
-                    });
-
-                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                    lastMessageCount = messages.length;
-                }
-            } catch (err) {
-                if (!isBackground) console.error(err);
-            }
-        }
-
-        function updateUI(isLoggedIn) {
-            const loginSection = document.getElementById('login-section'); // Deine Formulare
-            const contactSection = document.getElementById('suggestions-area'); // Der Kontakte-Bereich
-
-            if (isLoggedIn) {
-                loginSection.style.display = 'none';
-                contactSection.style.display = 'block';
-            } else {
-                loginSection.style.display = 'block';
-                contactSection.style.display = 'none';
-            }
-        }
-
-        function applyLoggedInUI(username) {
-            loggedInUser = { username: username, id: null };
-            authSection.style.display = 'none';
-            messageSection.style.display = 'block';
-            if (loggedInUsernameEl) {
-                loggedInUsernameEl.textContent = `Willkommen, ${username}! (Abmelden)`;
-            }
-            loadContacts();
-            document.getElementById('suggestions-area').style.display = 'block';
-            // Dem Socket-Server sagen, wer wir sind
-            socket.emit('join', username);
-            console.log("Socket-Raum beigetreten als:", username);
-        }
-
-            // Startet das Polling alle 3 Sekunden
-            if (messagePollingInterval) clearInterval(messagePollingInterval);
-            messagePollingInterval = setInterval(() => {
-                const chatPartner = document.getElementById('chatPartner').value.trim();
-                if (chatPartner) {
-                    fetchAndDisplayMessages(true); // "true" bedeutet: im Hintergrund laden
-                }
-            }, 3000);
-
-
-        function checkLoginStatus() {
-            const username = localStorage.getItem('safespeakUsername');
-            const token = localStorage.getItem('safespeakToken');
-            if (username && token) {
-                applyLoggedInUI(username);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('safespeakUsername');
-            localStorage.removeItem('safespeakToken');
-            loggedInUser = null;
-            authSection.style.display = 'block';
-            messageSection.style.display = 'none';
-            if (loggedInUsernameEl) {
-                loggedInUsernameEl.textContent = '';
-            }
-            responseDiv.textContent = 'Du wurdest abgemeldet.';
-        }
-
-        if (loggedInUsernameEl) {
-            loggedInUsernameEl.addEventListener('click', logout);
-        
-            clearInterval(messagePollingInterval); // Stoppt die Abfrage beim Logout
-        }
-
-        // Passwortsichtbarkeit mit dem Auge-Icon umschalten
-        function togglePasswordVisibility(fieldId) {
-            const input = document.getElementById(fieldId);
-            if (!input) return;
-            input.type = input.type === 'password' ? 'text' : 'password';
-        }
-
-        // Event-Listener für alle Auge-Buttons setzen (statt inline-onclick)
-        document.querySelectorAll('.toggle-password').forEach((btn) => {
-            const targetId = btn.dataset.target;
-            if (!targetId) return;
-            btn.addEventListener('click', () => togglePasswordVisibility(targetId));
-        });
-
-        // --- Theme-Kippschalter (Hell/Dunkel) ---
-        const toggleImage = document.getElementById('theme-toggle-img');
-        const themeToggleCheckbox = document.getElementById('themeToggle');
-        let isDarkMode = false;
-
-        function applyTheme(dark) {
-            isDarkMode = dark;
-            document.body.classList.toggle('dark-mode', dark);
-            if (themeToggleCheckbox) {
-                themeToggleCheckbox.checked = dark;
-            }
-            try {
-                localStorage.setItem('safespeakTheme', dark ? 'dark' : 'light');
-            } catch (e) {
-                console.warn('Konnte Theme nicht im localStorage speichern:', e);
-            }
-        }
-
-        function loadInitialTheme() {
-            let saved = null;
-            try {
-                saved = localStorage.getItem('safespeakTheme');
-            } catch (e) {
-                console.warn('Konnte Theme nicht aus localStorage lesen:', e);
-            }
-            applyTheme(saved === 'dark');
-        }
-
-        function switchTheme() {
-            applyTheme(!isDarkMode);
-        }
-
-        if (toggleImage) {
-            toggleImage.addEventListener('click', switchTheme, false);
-        }
-        if (themeToggleCheckbox) {
-            themeToggleCheckbox.addEventListener('change', switchTheme, false);
-        }
-
-
-        // WICHTIG: Alle fetch-Funktionen müssen jetzt prüfen, ob API_URL gesetzt ist.
-
-        async function fetchAndDisplayMessages() {
-            if (!API_URL) {
-                messagesDiv.textContent = 'Fehler: Server-URL nicht initialisiert.';
-                return;
-            }
-            // ... (Rest der Logik mit den Aufrufen an ${API_URL}/messages...)
-            // ... (Der restliche Code der Funktion bleibt wie gehabt)
-        }
-        
-        async function loginAndDisplay(username, password) {
-            if (!API_URL) {
-                responseDiv.textContent = 'Fehler: Server-URL nicht initialisiert.';
-                return;
-            }
-            // ... (Rest der Logik mit den Aufrufen an ${API_URL}/login...)
-            // ... (Der restliche Code der Funktion bleibt wie gehabt)
-        }
-
-        // Registrierungs-Handler für das Formular #registerForm
-        document.getElementById('registerForm').addEventListener('submit', async (event) => {
-            event.preventDefault(); // Verhindert Seiten-Reload
-
-            if (!API_URL) {
-                responseDiv.textContent = 'Fehler: Server-URL nicht initialisiert.';
-                return;
-            }
-
-        // ... im registerForm Event Listener ...
-        const username = document.getElementById('regUsername').value.trim();
+    // REGISTRIERUNG
+    document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('regUsername').value;
         const password = document.getElementById('regPassword').value;
-        const location = document.getElementById('regLocation').value.trim(); // NEU: Ort abgreifen
+        
+        // ADRESSE ZUSAMMENBAUEN
+        const zip = document.getElementById('regZip').value;
+        const city = document.getElementById('regCity').value;
+        const street = document.getElementById('regStreet').value;
+        const fullLocation = `${zip} ${city}, ${street}`;
 
         try {
-            const res = await fetch(API_URL + '/register', {
-            method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password, location }), // NEU: location mitsenden
-            });
-            // ... Rest bleibt gleich ...           
-
-                const data = await res.json().catch(() => ({}));
-
-                if (!res.ok) {
-                    responseDiv.textContent =
-                        data.error || data.errors || `Registrierung fehlgeschlagen (Status ${res.status}).`;
-                    return;
-                }
-
-                responseDiv.textContent = data.message || 'Benutzer erfolgreich registriert!';
-            } catch (err) {
-                console.error(err);
-                responseDiv.textContent = 'Netzwerkfehler bei der Registrierung: ' + err.message;
-            }
-        });
-        // Wenn ein Anruf reinkommt
-        socket.on('incoming-call', (data) => {
-            const startCall = confirm(`Eingehender Videoanruf von ${data.from}. Möchtest du annehmen?`);
-    
-            if (startCall) {
-                console.log("Anruf wird vorbereitet...");
-                // Hier starten wir später die PeerJS-Logik
-                openVideoWindow(data.from, data.offer);
-            } else {
-                console.log("Anruf abgelehnt.");
-                // Optional: 'call-rejected' zurücksenden
-            }
-        });
-
-        // Login-Handler für das Formular #loginForm
-        document.getElementById('loginForm').addEventListener('submit', async (event) => {
-            event.preventDefault();
-
-            if (!API_URL) {
-                responseDiv.textContent = 'Fehler: Server-URL nicht initialisiert.';
-                return;
-            }
-
-            const username = document.getElementById('loginUsername').value.trim();
-            const password = document.getElementById('loginPassword').value;
-
-            if (!username || !password) {
-                responseDiv.textContent = 'Bitte Benutzername und Passwort eingeben.';
-                return;
-            }
-
-            try {
-                const res = await fetch(API_URL + '/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password }),
-                });
-
-                const data = await res.json().catch(() => ({}));
-
-                if (!res.ok) {
-                    responseDiv.textContent =
-                        data.error || data.errors || `Login fehlgeschlagen (Status ${res.status}).`;
-                    return;
-                }
-
-                // Erfolgreicher Login: Token und Username speichern und UI aktualisieren
-                if (data.token) {
-                    localStorage.setItem('safespeakUsername', username);
-                    localStorage.setItem('safespeakToken', data.token);
-                }
-
-                applyLoggedInUI(username);
-
-                responseDiv.textContent = data.message || 'Anmeldung erfolgreich!';
-            } catch (err) {
-                console.error(err);
-                responseDiv.textContent = 'Netzwerkfehler beim Login: ' + err.message;
-            }
-        });
-
-    // Hilfsfunktion für Header mit Authentifizierung
-    function getAuthHeaders() {
-        const token = localStorage.getItem('safespeakToken');
-        return {
-            'Authorization': `Bearer ${token}`
-        };
-    }
-
-    // 1. NACHRICHT SENDEN (Inklusive Datei-Upload)
-    document.getElementById('messageForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-
-        if (!API_URL) return;
-
-        const receiverUsername = document.getElementById('receiverUsername').value.trim();
-        const content = document.getElementById('messageContent').value;
-        const fileInput = document.getElementById('file');
-
-        // Wir nutzen FormData, da wir eine Datei mitschicken könnten
-        const formData = new FormData();
-        formData.append('receiverUsername', receiverUsername);
-        formData.append('content', content);
-        if (fileInput.files[0]) {
-            formData.append('file', fileInput.files[0]);
-        }
-
-        try {
-            const res = await fetch(`${API_URL}/send`, {
+            const res = await fetch(`${API_URL}/register`, {
                 method: 'POST',
-                headers: getAuthHeaders(), // WICHTIG: Token mitsenden
-                body: formData
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password, location: fullLocation })
             });
-
             const data = await res.json();
-            if (res.ok) {
-                responseDiv.textContent = "Nachricht erfolgreich gesendet!";
-                document.getElementById('messageContent').value = ''; // Feld leeren
-                fileInput.value = ''; // Datei-Auswahl leeren
-                fetchAndDisplayMessages(); // Chat direkt aktualisieren
-            } else {
-                responseDiv.textContent = "Fehler: " + (data.message || data.error);
-            }
-        } catch (err) {
-            responseDiv.textContent = "Senden fehlgeschlagen: " + err.message;
-        }
+            responseDiv.textContent = data.message || data.error;
+        } catch (err) { responseDiv.textContent = "Fehler: " + err.message; }
     });
 
-    // 2. NACHRICHTEN LADEN
-    async function fetchAndDisplayMessages() {
-        const chatPartner = document.getElementById('chatPartner').value.trim();
-        if (!chatPartner) {
-            alert("Bitte gib einen Chat-Partner an.");
-            return;
-        }
+    // LOGIN
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value;
+        const password = document.getElementById('loginPassword').value;
 
         try {
-            const res = await fetch(`${API_URL}/messages?user2=${chatPartner}`, {
-                method: 'GET',
-                headers: getAuthHeaders()
+            const res = await fetch(`${API_URL}/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password })
             });
-
-            if (!res.ok) throw new Error("Fehler beim Laden");
-
-            const messages = await res.json();
-            messagesDiv.innerHTML = ''; // Vorherige Nachrichten löschen
-
-            messages.forEach(msg => {
-                const p = document.createElement('p');
-                // Check wer der Absender ist (für die Optik)
-                const senderName = msg.sender_id === loggedInUser.id ? "Du" : chatPartner;
             
-                let content = `<strong>${senderName}:</strong> ${msg.content}`;
-            
-                // Falls eine Datei dabei ist, Link generieren
-                if (msg.file_path) {
-                    const fileName = msg.file_path.split('/').pop();
-                    content += `<br><small>📎 Datei: <a href="#" onclick="downloadFile('${msg.file_path}')">${fileName}</a></small>`;
-                }
-            
-                p.innerHTML = content;
-                messagesDiv.appendChild(p);
-            });
-        
-            // Automatisch nach unten scrollen
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-
-        } catch (err) {
-            console.error(err);
-            messagesDiv.textContent = "Fehler beim Laden der Nachrichten.";
-        }
-    }
-
-    // 3. DATEI DOWNLOAD (Mit Token!)
-    async function downloadFile(filePath) {
-        try {
-            const res = await fetch(`${API_URL}/download/${encodeURIComponent(filePath)}`, {
-                headers: getAuthHeaders()
-            });
-        
+            const data = await res.json();
             if (res.ok) {
-                const blob = await res.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = filePath.split('/').pop();
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-            } else {
-                alert("Download nicht erlaubt oder Datei nicht gefunden.");
+                localStorage.setItem('safespeakToken', data.token);
+                localStorage.setItem('safespeakUsername', username);
+                applyLoggedInUI(username);
+            } else { responseDiv.textContent = data.error; }
+        } catch (err) { responseDiv.textContent = "Login-Fehler"; }
+    });
+
+    async function fetchAndDisplayMessages(isBackground = false) {
+        const partner = document.getElementById('chatPartner').value;
+        if(!partner) return;
+        try {
+            const res = await fetch(`${API_URL}/messages?user2=${partner}`, { headers: getAuthHeaders() });
+            const messages = await res.json();
+            if (messages.length !== lastMessageCount) {
+                messagesDiv.innerHTML = messages.map(m => `<p><b>${m.sender_id === loggedInUser.id ? 'Du' : partner}:</b> ${m.content}</p>`).join('');
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+                lastMessageCount = messages.length;
             }
-        } catch (err) {
-            alert("Download-Fehler.");
+        } catch (e) { if(!isBackground) console.error(e); }
+    }
+
+    // INITIALISIERUNG
+    async function init() {
+        const found = await findApiUrl();
+        if (found) {
+            const savedUser = localStorage.getItem('safespeakUsername');
+            if (savedUser) applyLoggedInUI(savedUser);
+        } else {
+            responseDiv.textContent = "Server nicht gefunden!";
         }
     }
 
-    // Event-Listener für den Refresh-Button
-    document.getElementById('refreshButton').addEventListener('click', fetchAndDisplayMessages);
+    loggedInUsernameEl.onclick = () => {
+        localStorage.clear();
+        location.reload();
+    };
+
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.onclick = () => {
+            const el = document.getElementById(btn.dataset.target);
+            el.type = el.type === 'password' ? 'text' : 'password';
+        };
+    });
+
+    init();
 </script>
 </body>
 </html>
