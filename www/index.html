@@ -94,7 +94,9 @@
 
         <div id="message-section" style="display: none;">
             <hr>
-            <h2>Chat mit <span id="activePartner">...</span></h2>
+            <h2>Chat mit:</h2>
+            <input type="text" id="activePartnerInput" placeholder="Benutzername eingeben..." style="font-weight: bold; color: #3498db; border: none; border-bottom: 2px solid #3498db; background: transparent; outline: none; width: 100%; font-size: 1.2em; margin-bottom: 10px;">
+            <div id="activePartner" style="display: none;">...</div> ```
             <div id="messages"></div>
             <form id="messageForm" style="margin-top:10px;">
                 <textarea id="messageContent" placeholder="Deine Nachricht..." required></textarea>
@@ -197,7 +199,7 @@
                 terminal.textContent = "> WARNUNG: Adress-Server nicht erreichbar. Fahre fort...";
             }
 
-            
+
 
             const res = await fetch(`${API_URL}/register`, {
                 method: 'POST',
@@ -254,7 +256,14 @@
             document.getElementById('messageForm').onsubmit = async (e) => {
                 e.preventDefault();
                 const content = document.getElementById('messageContent').value;
-                const receiver = document.getElementById('activePartner').textContent;
+                const receiverInput = document.getElementById('activePartnerInput');
+                const receiver = receiverInput.value.trim();
+
+                if (!receiver || receiver === "...") {
+                    terminal.textContent = "> FEHLER: Kein Empfänger gewählt!";
+                    terminal.style.color = "#ff4444";
+                    return;
+                }
                 const token = localStorage.getItem('safespeakToken');
 
                 if (receiver === "...") {
