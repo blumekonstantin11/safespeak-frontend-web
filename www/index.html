@@ -239,7 +239,10 @@
                 list.innerHTML = '';
                 contacts.forEach(user => {
                     const btn = document.createElement('button');
-                    btn.textContent = `${user.username} (${user.location || 'Unbekannt'})`;
+                    // Vorher: btn.textContent = `${user.username} (${user.location || '?'})`;
+                    // Nachher: Wir zeigen nur die PLZ und Stadt an, schneiden die Straße (nach dem Komma) ab
+                    const displayLocation = user.location ? user.location.split(',')[0] : 'In der Nähe';
+                    btn.textContent = `${user.username} (${displayLocation})`;
                     btn.style.margin = "5px";
                     btn.onclick = () => {
                         document.getElementById('receiverUsername').value = user.username;
@@ -305,7 +308,7 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password })
             });
-            
+
             const data = await res.json();
             if (res.ok) {
                 localStorage.setItem('safespeakToken', data.token);
