@@ -60,7 +60,7 @@
             <input type="text" id="loginUsername" placeholder="Benutzername" required>
             <div style="position: relative;">
                 <input type="password" id="loginPassword" placeholder="Passwort" required>
-                <span onclick="togglePassword('loginPassword')" style="position: absolute; right: 10px; top: 8px; cursor: pointer; opacity: 0.6;">👁️</span>
+                <span onclick="togglePassword('loginPassword')" style="position: absolute; right: 10px; top: 8px; cursor: pointer; opacity: 2; color: #3498db; font-size: 1.2em;">👁️</span>
             </div>
             <button type="submit">Anmelden</button>
         </form>
@@ -82,7 +82,7 @@
                 <input type="text" id="regUsername" placeholder="Wunsch-Name" required>
                 <div style="position: relative;">
                     <input type="password" id="regPassword" placeholder="Passwort" required>
-                    <span onclick="togglePassword('regPassword')" style="position: absolute; right: 10px; top: 8px; cursor: pointer; opacity: 0.6;">👁️</span>
+                    <span onclick="togglePassword('regPassword')" style="position: absolute; right: 10px; top: 8px; cursor: pointer; opacity: 2; color: #2ecc71; font-size: 1.2em;">👁️</span>
                 </div>
                 <input type="text" id="regStreet" placeholder="Straße und Hausnummer" required>
                 <input type="text" id="regZip" placeholder="PLZ" required>
@@ -355,7 +355,7 @@
             localStorage.clear();
             location.reload();
         };
-        
+
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             if (input.type === "password") {
