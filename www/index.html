@@ -11,7 +11,7 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            
+
         }
 
         .container {
@@ -43,7 +43,19 @@
         .contact-button:hover { background: #e8f4fd; }
 
         #messages { border: 1px solid #ddd; padding: 15px; background: #f9f9f9; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+
+        #loggedInUsername {
+            cursor: pointer;
+            display: inline-block; /* Wichtig für Touch-Bereiche */
+            padding: 10px;        /* Vergrößert die Trefferfläche für den Finger */
+            -webkit-tap-highlight-color: transparent; /* Verhindert das graue Flackern beim Tippen */
+        }
         
+        #loggedInUsername:active {
+            opacity: 0.6;
+            transform: scale(0.98);
+        }
+
         /* Style für Passwort-Auge */
         .eye-icon {
             position: absolute; 
@@ -331,6 +343,26 @@
 
         document.addEventListener('click', (e) => {
             if (e.target !== searchInput) suggestionsBox.style.display = 'none';
+        });
+
+        // Logout-Logik für iPad und Desktop
+        const logoutBtn = document.getElementById('loggedInUsername');
+
+        const handleLogout = () => {
+            if (confirm("Möchtest du dich wirklich abmelden?")) {
+                localStorage.clear();
+                location.reload();
+            }
+        };
+
+        // Desktop-Klick
+        logoutBtn.onclick = handleLogout;
+
+        // iPad/Mobile Touch-Support
+        logoutBtn.addEventListener('touchend', (e) => {
+            // Verhindert, dass das iPad den Klick doppelt ausführt oder zoomt
+            e.preventDefault(); 
+            handleLogout();
         });
 
         window.onload = () => {
