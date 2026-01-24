@@ -199,169 +199,71 @@
         </div>
     </div>
 
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
 <script>
+    // 2. ÄNDERUNG: Feste URL-Zuweisung, damit 'null' verschwindet
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const POSSIBLE_API_URLS = isLocalhost ? ['http://localhost:3000'] : ['https://safespeak-api-server.onrender.com'];
     
-    let API_URL = null;
-    let loggedInUser = { username: null, id: null };
-    let messagePollingInterval = null;
-    let lastMessageCount = 0;
+    // HIER DEINE RENDER-URL EINTRAGEN
+    const RENDER_URL = 'https://safespeak-api-server.onrender.com'; 
+    let API_URL = isLocalhost ? 'http://localhost:3000' : RENDER_URL;
 
-    const socket = typeof io !== 'undefined' ? io() : null;
-    const responseDiv = document.getElementById('response');
-    const authSection = document.getElementById('auth-section');
-    const messageSection = document.getElementById('message-section');
-    const suggestionsArea = document.getElementById('suggestions-area');
-    const messagesDiv = document.getElementById('messages');
-    const loggedInUsernameEl = document.getElementById('loggedInUsername');
+    // Socket-Initialisierung korrigiert
+    const socket = io(API_URL, { autoConnect: false }); 
 
-    async function findApiUrl() {
-        for (const url of POSSIBLE_API_URLS) {
-            try {
-                const res = await fetch(url + '/', { method: 'GET' });
-                if (res.ok) { API_URL = url; return true; }
-            } catch (e) { console.warn("Server nicht erreichbar unter " + url); }
-        }
-        return false;
+    // --- FARBWECHSEL FUNKTION (Wiederbelebt) ---
+    let isDarkMode = false;
+    const toggleImage = document.getElementById('theme-toggle-img');
+
+    function applyTheme(dark) {
+        isDarkMode = dark;
+        document.body.classList.toggle('dark-mode', dark);
+        localStorage.setItem('safespeakTheme', dark ? 'dark' : 'light');
     }
 
-    function getAuthHeaders() {
-        return { 'Authorization': `Bearer ${localStorage.getItem('safespeakToken')}`, 'Content-Type': 'application/json' };
+    if (toggleImage) {
+        toggleImage.addEventListener('click', () => applyTheme(!isDarkMode));
     }
 
-    async function loadContacts() {
-        try {
-            const res = await fetch(`${API_URL}/contacts`, { headers: getAuthHeaders() });
-            if (res.ok) {
-                const contacts = await res.json();
-                const list = document.getElementById('contact-list');
-                list.innerHTML = '';
-                contacts.forEach(user => {
-                    const btn = document.createElement('button');
-                    // Vorher: btn.textContent = `${user.username} (${user.location || '?'})`;
-                    // Nachher: Wir zeigen nur die PLZ und Stadt an, schneiden die Straße (nach dem Komma) ab
-                    const displayLocation = user.location ? user.location.split(',')[0] : 'In der Nähe';
-                    btn.textContent = `${user.username} (${displayLocation})`;
-                    btn.style.margin = "5px";
-                    btn.onclick = () => {
-                        document.getElementById('receiverUsername').value = user.username;
-                        document.getElementById('chatPartner').value = user.username;
-                        fetchAndDisplayMessages();
-                    };
-                    list.appendChild(btn);
-                });
-            }
-        } catch (err) { console.error("Kontaktfehler", err); }
-    }
-
-    function applyLoggedInUI(username) {
-        loggedInUser.username = username;
-        authSection.style.display = 'none';
-        messageSection.style.display = 'block';
-        suggestionsArea.style.display = 'block';
-        loggedInUsernameEl.textContent = `Willkommen, ${username} (Logout)`;
-        if(socket) socket.emit('join', username);
-        loadContacts();
-        startPolling();
-    }
-
-    function startPolling() {
-        if(messagePollingInterval) clearInterval(messagePollingInterval);
-        messagePollingInterval = setInterval(() => {
-            if(document.getElementById('chatPartner').value) fetchAndDisplayMessages(true);
-        }, 3000);
-    }
-
-    function switchTheme() {
-        isDarkMode = !isDarkMode;
-        document.body.classList.toggle('dark-mode', isDarkMode);
-        localStorage.setItem('safespeakTheme', isDarkMode ? 'dark' : 'light');
-    }
-    
-    // REGISTRIERUNG
+    // --- REGISTRIERUNG (Fix für den /null/ Fehler) ---
     document.getElementById('registerForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const username = document.getElementById('regUsername').value;
         const password = document.getElementById('regPassword').value;
         
-        // ADRESSE ZUSAMMENBAUEN
+        // Adress-Zusammenbau
         const zip = document.getElementById('regZip').value;
         const city = document.getElementById('regCity').value;
         const street = document.getElementById('regStreet').value;
         const fullLocation = `${zip} ${city}, ${street}`;
 
         try {
-            const res = await fetch(`${API_URL}/register`, {
+            const res = await fetch(`${API_URL}/register`, { // Nutzt jetzt die korrekte URL
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password, location: fullLocation })
             });
             const data = await res.json();
-            responseDiv.textContent = data.message || data.error;
-        } catch (err) { responseDiv.textContent = "Fehler: " + err.message; }
-    });
-
-    // LOGIN
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const username = document.getElementById('loginUsername').value;
-        const password = document.getElementById('loginPassword').value;
-
-        try {
-            const res = await fetch(`${API_URL}/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password })
-            });
-
-            const data = await res.json();
-            if (res.ok) {
-                localStorage.setItem('safespeakToken', data.token);
-                localStorage.setItem('safespeakUsername', username);
-                applyLoggedInUI(username);
-            } else { responseDiv.textContent = data.error; }
-        } catch (err) { responseDiv.textContent = "Login-Fehler"; }
-    });
-
-    async function fetchAndDisplayMessages(isBackground = false) {
-        const partner = document.getElementById('chatPartner').value;
-        if(!partner) return;
-        try {
-            const res = await fetch(`${API_URL}/messages?user2=${partner}`, { headers: getAuthHeaders() });
-            const messages = await res.json();
-            if (messages.length !== lastMessageCount) {
-                messagesDiv.innerHTML = messages.map(m => `<p><b>${m.sender_id === loggedInUser.id ? 'Du' : partner}:</b> ${m.content}</p>`).join('');
-                messagesDiv.scrollTop = messagesDiv.scrollHeight;
-                lastMessageCount = messages.length;
-            }
-        } catch (e) { if(!isBackground) console.error(e); }
-    }
-
-    // INITIALISIERUNG
-    async function init() {
-        const found = await findApiUrl();
-        if (found) {
-            const savedUser = localStorage.getItem('safespeakUsername');
-            if (savedUser) applyLoggedInUI(savedUser);
-        } else {
-            responseDiv.textContent = "Server nicht gefunden!";
+            document.getElementById('response').textContent = data.message || data.error;
+        } catch (err) { 
+            document.getElementById('response').textContent = "Server nicht erreichbar!";
         }
-    }
+    });
 
-    loggedInUsernameEl.onclick = () => {
-        localStorage.clear();
-        location.reload();
+    // --- INITIALISIERUNG BEIM LADEN ---
+    window.onload = () => {
+        const savedTheme = localStorage.getItem('safespeakTheme');
+        applyTheme(savedTheme === 'dark');
+
+        const savedUser = localStorage.getItem('safespeakUsername');
+        if (savedUser) {
+            applyLoggedInUI(savedUser);
+            socket.connect(); // Socket erst nach Login/Validierung verbinden
+        }
     };
 
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-        btn.onclick = () => {
-            const el = document.getElementById(btn.dataset.target);
-            el.type = el.type === 'password' ? 'text' : 'password';
-        };
-    });
-
-    init();
+    // ... (Restliche Funktionen wie applyLoggedInUI von vorhin übernehmen)
 </script>
 </body>
 </html>
