@@ -70,7 +70,7 @@
 
         <div id="reg-toggle-area">
             <p>Noch kein Konto?</p>
-            <button onclick="toggleRegister()" style="background-color: #7f8c8d;">Jetzt Registrieren</button>
+            <button onclick="toggleRegister()" style="background-color: #2ecc71; color: white; font-weight: bold; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Jetzt Registrieren</button>
         </div>
 
         <div id="register-container" style="display: none; margin-top: 20px;">
@@ -136,7 +136,7 @@
             loadContacts();
         }
 
-        
+
         document.getElementById('loginForm').onsubmit = async (e) => {
             e.preventDefault();
             const terminal = document.getElementById('terminal-status');
