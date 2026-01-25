@@ -117,7 +117,7 @@
         
         <div id="auth-section">
             <h2>Anmelden</h2>
-            
+
             <form id="loginForm">
                 <input type="text" id="loginUsername" placeholder="Benutzername" required>
 
@@ -260,9 +260,15 @@
 
             const data = await res.json();
             if (data.userId) {
+                // HIER DIE ÄNDERUNG:
+                terminal.style.color = "#00ff00"; // Leuchtendes Grün für Erfolg
                 terminal.textContent = "> Erfolg! Bitte anmelden.";
-                toggleRegister();
+        
+                // Optional: Nach 3 Sekunden zurück auf Standardfarbe
+                setTimeout(() => { toggleRegister(); }, 1500); 
             } else {
+                // Bei Fehler auf Rot setzen
+                terminal.style.color = "#ff4444"; 
                 terminal.textContent = "> Fehler: " + data.error;
             }
         };
