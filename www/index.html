@@ -387,11 +387,16 @@
         const logoutBtn = document.getElementById('loggedInUsername');
 
         const handleLogout = () => {
-            if (confirm("Möchtest du dich wirklich abmelden?")) {
-                localStorage.clear();
-                location.reload();
-            }
+            localStorage.clear();
+            location.reload();
         };
+
+        // Listener bleiben gleich
+        logoutBtn.onclick = handleLogout;
+        logoutBtn.addEventListener('touchend', (e) => {
+            e.preventDefault(); 
+            handleLogout();
+        });
 
         // Desktop-Klick
         logoutBtn.onclick = handleLogout;
