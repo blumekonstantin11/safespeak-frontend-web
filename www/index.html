@@ -105,6 +105,52 @@
         }
         .suggestion-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
         .suggestion-item:hover { background: #f0f7ff; }
+
+        /* Das Hintergrund-Overlay */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            background-color: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+        }
+
+        /* Das Inhalts-Fenster */
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto; 
+            padding: 20px;
+            border-radius: 12px;
+            width: 80%; 
+            max-width: 800px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Schließen-Button */
+        .close-modal {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #333;
+        }
+
+        /* Der PDF-Viewer (Iframe) */
+        #legalFrame {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
@@ -159,6 +205,19 @@
                     <input type="text" id="regCity" placeholder="Stadt" required>
                     <button type="submit" id="regBtn" style="background-color: #2ecc71;">Konto erstellen</button>
                 </form>
+            </div>
+        </div>
+
+        <div class="legal-links">
+            <a href="#" onclick="openLegal('agb.pdf')">AGB</a>
+            <span style="color: #ccc;">|</span>
+            <a href="#" onclick="openLegal('datenschutz.pdf')">Datenschutz</a>
+        </div>
+
+        <div id="legalModal" class="modal">
+            <div class="modal-content">
+                <span class="close-modal" onclick="closeLegal()">&times;</span>
+                <iframe id="legalFrame" src=""></iframe>
             </div>
         </div>
 
@@ -283,6 +342,29 @@
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             input.type = input.type === "password" ? "text" : "password";
+        }
+
+        function openLegal(fileName) {
+            const modal = document.getElementById('legalModal');
+            const frame = document.getElementById('legalFrame');
+            // Greift direkt auf den Frontend-Pfad zu
+            frame.src = `./${fileName}`; 
+            modal.style.display = "block";
+        }
+
+        function closeLegal() {
+            const modal = document.getElementById('legalModal');
+            const frame = document.getElementById('legalFrame');
+            modal.style.display = "none";
+            frame.src = ""; // Stoppt das Laden im Hintergrund
+        }
+
+        // Schließen, wenn man außerhalb des Fensters klickt
+        window.onclick = function(event) {
+            const modal = document.getElementById('legalModal');
+            if (event.target == modal) {
+                closeLegal();
+            }
         }
 
         async function fetchMessages(partnerName) {
